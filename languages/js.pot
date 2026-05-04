@@ -1,0 +1,20 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+"X-Generator: babel-plugin-makepot\n"
+
+#: src/admin/components/organisms/admin-header.js:24
+msgid "Getting started"
+msgstr ""
+
+#: src/admin/components/organisms/admin-header.js:29
+msgid "Settings"
+msgstr ""
+
+#: src/admin/components/organisms/admin-header.js:33
+msgid "Rules"
+msgstr ""
+
+#: src/admin/components/organisms/admin-header.js:51
+msgid "Show all hidden informations, notices and documentations "
+msgstr ""
