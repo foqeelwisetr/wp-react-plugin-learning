@@ -34,7 +34,9 @@
 		"replace-in-file": "^7.2.0"
 	},
 	"dependencies": {
+		"@wordpress/api-fetch": "^7.5.0",
 		"@wordpress/components": "^29.5.0",
+		"@wordpress/element": "^6.5.0",
 		"@wordpress/url": "^4.19.0",
 		"atrc": "^1.0.35",
 		"classnames": "^2.5.1",
