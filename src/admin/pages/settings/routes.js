@@ -5,95 +5,126 @@ import { useContext } from '@wordpress/element';
 /* Library */
 import { isEmpty } from 'lodash';
 
-/*Atrc*/
+/* Atrc */
 import {
-    AtrcRoute,
-    AtrcRoutes,
-    AtrcNavigate,
-    AtrcNav,
-    AtrcWireFrameSidebarContent,
+	AtrcRoute,
+	AtrcRoutes,
+	AtrcNavigate,
+	AtrcNav,
+	AtrcWireFrameSidebarContent,
 } from 'atrc';
 
-/*Inbuilt*/
-import { Settings1, Settings2, Advanced } from './pages';
+/* Inbuilt */
 import { AtrcReduxContextData } from '../../routes';
-import { SaveSettings } from '../../components/atoms';
+import SchemaSettings, {
+	useSettingsUiBootstrap,
+} from './schema-settings';
 
-/*Local*/
-const SettingsRouters = () => {
-    return (
-        <>
-            <AtrcRoutes>
-                <AtrcRoute
-                    path='setting1'
-                    element={<Settings1 />}
-                />
-                <AtrcRoute
-                    path='setting2'
-                    element={<Settings2 />}
-                />
-                <AtrcRoute
-                    path='advanced'
-                    element={<Advanced />}
-                />
-                <AtrcRoute
-                    index
-                    element={
-                        <AtrcNavigate
-                            to='/settings/setting1'
-                            replace
-                        />
-                    }
-                />
-            </AtrcRoutes>
-            <SaveSettings />
-        </>
-    );
+/* PHP-driven settings (sidebar + tabs from REST). */
+const SettingsIndexRedirect = ( { firstSlug } ) => {
+	if ( ! firstSlug ) {
+		return (
+			<p className="wpextrulepricing-settings-ui__loading-inline">
+				{ __( 'No tabs registered in PHP.', 'wp-ext-rule-pricing' ) }
+			</p>
+		);
+	}
+	return (
+		<AtrcNavigate
+			to={ `/settings/${ firstSlug }` }
+			replace
+		/>
+	);
+};
+
+const SettingsRouters = ( { tabs, values, setValues } ) => {
+	const firstSlug = tabs[ 0 ]?.slug || '';
+
+	return (
+		<AtrcRoutes>
+			<AtrcRoute
+				index
+				element={ <SettingsIndexRedirect firstSlug={ firstSlug } /> }
+			/>
+			<AtrcRoute
+				path=":tabSlug"
+				element={
+					<SchemaSettings
+						tabs={ tabs }
+						values={ values }
+						setValues={ setValues }
+					/>
+				}
+			/>
+		</AtrcRoutes>
+	);
 };
 
 const InitSettings = () => {
-    const data = useContext(AtrcReduxContextData);
-    const { dbSettings } = data;
+	const data = useContext( AtrcReduxContextData );
+	const { dbSettings } = data;
+	const { tabs, values, setValues, loading, error } =
+		useSettingsUiBootstrap();
 
-    if (isEmpty(dbSettings)) {
-        return null;
-    }
-    return (
-        <AtrcWireFrameSidebarContent
-            wrapProps={{
-                tag: 'div',
-                className: 'at-ctnr-fld',
-            }}
-            rowProps={{}}
-            renderSidebar={
-                <AtrcNav
-                    variant='vertical'
-                    navs={[
-                        {
-                            to: '/settings/setting1',
-                            children: __('Settings 1', 'wp-ext-rule-pricing'),
-                        },
-                        {
-                            to: '/settings/setting2',
-                            children: __('Settings 2', 'wp-ext-rule-pricing'),
-                        },
-                        {
-                            to: '/settings/advanced',
-                            children: __('Advanced', 'wp-ext-rule-pricing'),
-                        },
-                    ]}
-                />
-            }
-            renderContent={<SettingsRouters />}
-            contentProps={{
-                tag: 'div',
-                contentCol: 'at-col-10',
-            }}
-            sidebarProps={{
-                sidebarCol: 'at-col-2',
-            }}
-        />
-    );
+	if ( isEmpty( dbSettings ) ) {
+		return null;
+	}
+
+	if ( loading ) {
+		return (
+			<div className="wpextrulepricing-settings-ui__loading">
+				{ __( 'Loading settings…', 'wp-ext-rule-pricing' ) }
+			</div>
+		);
+	}
+
+	if ( error ) {
+		return (
+			<div className="wpextrulepricing-settings-ui__error">
+				{ error }
+			</div>
+		);
+	}
+
+	const navs = tabs.map( ( tab ) => ( {
+		to: `/settings/${ tab.slug }`,
+		children: tab.label || tab.slug,
+	} ) );
+
+	return (
+		<AtrcWireFrameSidebarContent
+			wrapProps={ {
+				tag: 'div',
+				className: 'at-ctnr-fld wpextrulepricing-settings-ui',
+			} }
+			rowProps={ {} }
+			renderSidebar={
+				<div className="wpextrulepricing-settings-ui__sidebar-inner">
+					<h2 className="wpextrulepricing-settings-ui__sidebar-title">
+						{ __( 'Settings', 'wp-ext-rule-pricing' ) }
+					</h2>
+					<AtrcNav
+						variant="vertical"
+						navs={ navs }
+					/>
+				</div>
+			}
+			renderContent={
+				<SettingsRouters
+					tabs={ tabs }
+					values={ values }
+					setValues={ setValues }
+				/>
+			}
+			contentProps={ {
+				tag: 'div',
+				contentCol: 'at-col-10',
+			} }
+			sidebarProps={ {
+				sidebarCol: 'at-col-2',
+			} }
+		/>
+	);
 };
 
 export default InitSettings;
