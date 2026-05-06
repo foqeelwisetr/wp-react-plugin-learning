@@ -1,9 +1,5 @@
 /* WordPress */
 import { __ } from '@wordpress/i18n';
-import { useContext } from '@wordpress/element';
-
-/* Library */
-import { isEmpty } from 'lodash';
 
 /* Atrc */
 import {
@@ -15,7 +11,6 @@ import {
 } from 'atrc';
 
 /* Inbuilt */
-import { AtrcReduxContextData } from '../../routes';
 import SchemaSettings, {
 	useSettingsUiBootstrap,
 } from './schema-settings';
@@ -61,14 +56,8 @@ const SettingsRouters = ( { tabs, values, setValues } ) => {
 };
 
 const InitSettings = () => {
-	const data = useContext( AtrcReduxContextData );
-	const { dbSettings } = data;
 	const { tabs, values, setValues, loading, error } =
 		useSettingsUiBootstrap();
-
-	if ( isEmpty( dbSettings ) ) {
-		return null;
-	}
 
 	if ( loading ) {
 		return (

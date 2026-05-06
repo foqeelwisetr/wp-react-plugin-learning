@@ -8,16 +8,13 @@ AtrcApis.baseUrl({
     url: wpextrulepricingLocalize.rest_url,
 });
 
-/* Settings */
-AtrcApis.register({
-    key: 'settings',
-    path: 'wp-ext-rule-pricing/v1/settings',
-    type: 'settings',
-});
-
-/* Settings Local for user preferance work with Window: localStorage property */
+/* Preferences (local only; replaces legacy GET/POST wp-ext-rule-pricing/v1/settings). */
 AtrcStore.register({
     key: 'wpextrulepricingLocal',
+    type: 'localStorage',
+});
+AtrcStore.register({
+    key: 'settings',
     type: 'localStorage',
 });
 
