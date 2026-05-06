@@ -25,25 +25,22 @@ const SettingsRouters = () => {
         <>
             <AtrcRoutes>
                 <AtrcRoute
-                    exact
-                    path='setting1/*'
+                    path='setting1'
                     element={<Settings1 />}
                 />
                 <AtrcRoute
-                    exact
-                    path='setting2/*'
+                    path='setting2'
                     element={<Settings2 />}
                 />
                 <AtrcRoute
-                    exact
-                    path='advanced/*'
+                    path='advanced'
                     element={<Advanced />}
                 />
                 <AtrcRoute
-                    path='/'
+                    index
                     element={
                         <AtrcNavigate
-                            to='setting1'
+                            to='/settings/setting1'
                             replace
                         />
                     }
@@ -73,15 +70,15 @@ const InitSettings = () => {
                     variant='vertical'
                     navs={[
                         {
-                            to: 'setting1',
+                            to: '/settings/setting1',
                             children: __('Settings 1', 'wp-ext-rule-pricing'),
                         },
                         {
-                            to: 'setting2',
+                            to: '/settings/setting2',
                             children: __('Settings 2', 'wp-ext-rule-pricing'),
                         },
                         {
-                            to: 'advanced',
+                            to: '/settings/advanced',
                             children: __('Advanced', 'wp-ext-rule-pricing'),
                         },
                     ]}
