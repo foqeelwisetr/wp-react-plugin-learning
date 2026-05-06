@@ -41,7 +41,8 @@ const MainContent = () => {
                     onChange={newVal =>
                         dbUpdateSetting('setting1', newVal)
                     }
-
+                    __next40pxDefaultSize
+                    __nextHasNoMarginBottom
                 />
             </AtrcPanelRow>
             <AtrcPanelRow>
@@ -52,7 +53,8 @@ const MainContent = () => {
                     onChange={newVal =>
                         dbUpdateSetting('setting2', newVal)
                     }
-
+                    __next40pxDefaultSize
+                    __nextHasNoMarginBottom
                 />
             </AtrcPanelRow>
         </AtrcContent>

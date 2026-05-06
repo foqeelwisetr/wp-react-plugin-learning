@@ -43,6 +43,14 @@ class WP_EXT_RULE_PRICING_API_Get_Rules extends WP_EXT_RULE_PRICING_API_Base {
 				'id'    => 1,
 				'title' => __( 'Example rule', 'wp-ext-rule-pricing' ),
 			),
+			array(
+				'id'    => 2,
+				'title' => __( 'Example rule two', 'wp-ext-rule-pricing' ),
+			),
+			array(
+				'id'    => 3,
+				'title' => __( 'Example rule three', 'wp-ext-rule-pricing' ),
+			),
 		);
 
 		/**
@@ -53,7 +61,9 @@ class WP_EXT_RULE_PRICING_API_Get_Rules extends WP_EXT_RULE_PRICING_API_Base {
 		$rules = apply_filters( 'wp_ext_rule_pricing_rest_rules', $rules );
 
 		if ( ! is_array( $rules ) ) {
-			$rules = array();
+			return $this->error_response_bad_request(
+				__( 'Invalid rules data after filter; expected an array.', 'wp-ext-rule-pricing' )
+			);
 		}
 
 		$this->response_code = 200;
@@ -61,7 +71,7 @@ class WP_EXT_RULE_PRICING_API_Get_Rules extends WP_EXT_RULE_PRICING_API_Base {
 
 		return $this->success_response(
 			$rules,
-			__( 'Rules loaded.', 'wp-ext-rule-pricing' )
+			__( 'Rules loaded successfully.', 'wp-ext-rule-pricing' )
 		);
 	}
 }

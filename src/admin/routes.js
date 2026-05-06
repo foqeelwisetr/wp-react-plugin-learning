@@ -103,7 +103,13 @@ const InitDatabaseSettings = (props) => {
     };
     return (
         <AtrcReduxContextData.Provider value={{ ...dbProps }}>
-            <AtrcHashRouter basename='/'>
+            <AtrcHashRouter
+                basename='/'
+                future={ {
+                    v7_startTransition: true,
+                    v7_relativeSplatPath: true,
+                } }
+            >
                 <AtrcWrap
                     variant='wrp'
                     className='at-box-szg at-m at-typ'>

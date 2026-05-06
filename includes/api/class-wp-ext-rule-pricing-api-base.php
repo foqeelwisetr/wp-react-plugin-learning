@@ -80,10 +80,15 @@ abstract class WP_EXT_RULE_PRICING_API_Base {
 
 		try {
 			return $this->process_api_call();
-		} catch ( Error $e ) {
+		} catch ( Throwable $e ) {
 			$this->response_code = 500;
 
-			return $this->error_response( $e->getMessage(), null, 500 );
+			return $this->error_response(
+				$e->getMessage(),
+				null,
+				500,
+				'wp_ext_rule_pricing_api_server_error'
+			);
 		}
 	}
 
@@ -93,14 +98,19 @@ abstract class WP_EXT_RULE_PRICING_API_Base {
 	abstract public function process_api_call();
 
 	/**
-	 * @param string        $message Message.
-	 * @param WP_Error|null $wp_error Optional error.
-	 * @param int           $code Status code hint.
+	 * REST error (WP_Error). WordPress maps this to JSON with `code`, `message`, `data.status`.
+	 *
+	 * @param string|array  $message Message string, or legacy empty array as first arg (ignored).
+	 * @param WP_Error|null $wp_error Optional WP_Error to merge message/data from.
+	 * @param int           $code HTTP-style status (400, 404, 500, …). 0 keeps or defaults to 400.
+	 * @param string        $error_code Machine-readable WP_Error code slug.
 	 * @return WP_Error
 	 */
-	public function error_response( $message = '', $wp_error = null, $code = 0 ) {
+	public function error_response( $message = '', $wp_error = null, $code = 0, $error_code = 'wp_ext_rule_pricing_api_error' ) {
 		if ( 0 !== absint( $code ) ) {
 			$this->response_code = absint( $code );
+		} elseif ( empty( $this->response_code ) || $this->response_code < 400 ) {
+			$this->response_code = 400;
 		}
 
 		$data = array();
@@ -109,19 +119,45 @@ abstract class WP_EXT_RULE_PRICING_API_Base {
 			$data    = $wp_error->get_error_data();
 		}
 
-		if ( ! is_string( $message ) ) {
+		if ( is_array( $message ) ) {
 			$message = '';
+		}
+
+		if ( ! is_string( $message ) ) {
+			$message = __( 'Request could not be processed.', 'wp-ext-rule-pricing' );
 		}
 
 		$status = $this->response_code >= 400 && $this->response_code < 600
 			? $this->response_code
 			: 400;
 
-		return new WP_Error(
-			'wp_ext_rule_pricing_api_error',
-			$message,
-			array_merge( array( 'status' => $status ), is_array( $data ) ? $data : array() )
+		$payload = array_merge(
+			array( 'status' => $status ),
+			is_array( $data ) ? $data : array()
 		);
+
+		return new WP_Error( sanitize_key( $error_code ), $message, $payload );
+	}
+
+	/**
+	 * Shorthand for validation / bad-request errors.
+	 *
+	 * @param string $message Human-readable message.
+	 * @param int    $status HTTP status (default 400).
+	 * @return WP_Error
+	 */
+	public function error_response_bad_request( $message, $status = 400 ) {
+		return $this->error_response( $message, null, $status, 'wp_ext_rule_pricing_api_bad_request' );
+	}
+
+	/**
+	 * Shorthand for not-found style errors.
+	 *
+	 * @param string $message Human-readable message.
+	 * @return WP_Error
+	 */
+	public function error_response_not_found( $message ) {
+		return $this->error_response( $message, null, 404, 'wp_ext_rule_pricing_api_not_found' );
 	}
 
 	/**
