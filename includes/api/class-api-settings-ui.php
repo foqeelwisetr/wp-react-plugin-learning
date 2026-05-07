@@ -56,6 +56,75 @@ if ( ! class_exists( 'WP_EXT_RULE_PRICING_Api_Settings_Ui' ) ) {
 		}
 
 		/**
+		 * One field row for REST schema output.
+		 *
+		 * @param array<string, mixed> $field Field definition.
+		 * @return array<string, mixed>|null
+		 */
+		protected function format_field_for_ui_response( $field ) {
+			if ( ! is_array( $field ) ) {
+				return null;
+			}
+			$f = array(
+				'id'               => sanitize_key( $field['id'] ?? '' ),
+				'type'             => sanitize_key( $field['type'] ?? 'text' ),
+				'label'            => isset( $field['label'] ) ? wp_kses_post( $field['label'] ) : '',
+				'description'      => isset( $field['description'] ) ? wp_kses_post( $field['description'] ) : '',
+				'placeholder'      => isset( $field['placeholder'] ) ? sanitize_text_field( (string) $field['placeholder'] ) : '',
+				'default'          => $field['default'] ?? null,
+				'options'          => isset( $field['options'] ) && is_array( $field['options'] ) ? $field['options'] : array(),
+				'rows'             => isset( $field['rows'] ) ? absint( $field['rows'] ) : 4,
+				'min'              => isset( $field['min'] ) ? $field['min'] : null,
+				'max'              => isset( $field['max'] ) ? $field['max'] : null,
+				'step'             => isset( $field['step'] ) ? $field['step'] : null,
+				'content'          => isset( $field['content'] ) ? wp_kses_post( $field['content'] ) : '',
+				'allow_free_text'  => ! empty( $field['allow_free_text'] ),
+				'buttons'          => array(),
+			);
+			if ( '' === $f['id'] ) {
+				return null;
+			}
+			if ( 'link_buttons' === $f['type'] && ! empty( $field['buttons'] ) && is_array( $field['buttons'] ) ) {
+				foreach ( $field['buttons'] as $btn ) {
+					if ( ! is_array( $btn ) ) {
+						continue;
+					}
+					$f['buttons'][] = array(
+						'label'            => isset( $btn['label'] ) ? sanitize_text_field( (string) $btn['label'] ) : '',
+						'url'              => isset( $btn['url'] ) ? esc_url_raw( (string) $btn['url'] ) : '',
+						'opens_in_new_tab' => ! empty( $btn['opens_in_new_tab'] ),
+					);
+				}
+			}
+
+			return $f;
+		}
+
+		/**
+		 * One section row for REST schema output.
+		 *
+		 * @param array<string, mixed> $sec Section definition.
+		 * @return array<string, mixed>
+		 */
+		protected function format_section_for_ui_response( $sec ) {
+			$sec       = is_array( $sec ) ? $sec : array();
+			$sec_row = array(
+				'id'          => sanitize_key( $sec['id'] ?? 'section' ),
+				'title'       => isset( $sec['title'] ) ? wp_kses_post( $sec['title'] ) : '',
+				'description' => isset( $sec['description'] ) ? wp_kses_post( $sec['description'] ) : '',
+				'fields'      => array(),
+			);
+			foreach ( $sec['fields'] ?? array() as $field ) {
+				$formatted = $this->format_field_for_ui_response( $field );
+				if ( null !== $formatted ) {
+					$sec_row['fields'][] = $formatted;
+				}
+			}
+
+			return $sec_row;
+		}
+
+		/**
 		 * Strip PHP-only keys from schema sent to JS.
 		 *
 		 * @param array<int, array<string, mixed>> $tabs Tabs.
@@ -64,40 +133,33 @@ if ( ! class_exists( 'WP_EXT_RULE_PRICING_Api_Settings_Ui' ) ) {
 		protected function tabs_for_response( $tabs ) {
 			$out = array();
 			foreach ( $tabs as $tab ) {
+				$tab = is_array( $tab ) ? $tab : array();
 				$row = array(
-					'slug'     => sanitize_key( $tab['slug'] ?? '' ),
-					'label'    => isset( $tab['label'] ) ? wp_kses_post( $tab['label'] ) : '',
-					'sections' => array(),
+					'slug'        => sanitize_key( $tab['slug'] ?? '' ),
+					'label'       => isset( $tab['label'] ) ? wp_kses_post( $tab['label'] ) : '',
+					'sections'    => array(),
+					'subsections' => array(),
 				);
 				foreach ( $tab['sections'] ?? array() as $sec ) {
-					$sec_row = array(
-						'id'          => sanitize_key( $sec['id'] ?? 'section' ),
-						'title'       => isset( $sec['title'] ) ? wp_kses_post( $sec['title'] ) : '',
-						'description' => isset( $sec['description'] ) ? wp_kses_post( $sec['description'] ) : '',
-						'fields'      => array(),
-					);
-					foreach ( $sec['fields'] ?? array() as $field ) {
-						$f = array(
-							'id'               => sanitize_key( $field['id'] ?? '' ),
-							'type'             => sanitize_key( $field['type'] ?? 'text' ),
-							'label'            => isset( $field['label'] ) ? wp_kses_post( $field['label'] ) : '',
-							'description'      => isset( $field['description'] ) ? wp_kses_post( $field['description'] ) : '',
-							'placeholder'      => isset( $field['placeholder'] ) ? sanitize_text_field( (string) $field['placeholder'] ) : '',
-							'default'          => $field['default'] ?? null,
-							'options'          => isset( $field['options'] ) && is_array( $field['options'] ) ? $field['options'] : array(),
-							'rows'             => isset( $field['rows'] ) ? absint( $field['rows'] ) : 4,
-							'min'              => isset( $field['min'] ) ? $field['min'] : null,
-							'max'              => isset( $field['max'] ) ? $field['max'] : null,
-							'step'             => isset( $field['step'] ) ? $field['step'] : null,
-							'content'         => isset( $field['content'] ) ? wp_kses_post( $field['content'] ) : '',
-							'allow_free_text' => ! empty( $field['allow_free_text'] ),
-						);
-						if ( '' === $f['id'] ) {
-							continue;
-						}
-						$sec_row['fields'][] = $f;
+					$row['sections'][] = $this->format_section_for_ui_response( $sec );
+				}
+				foreach ( $tab['subsections'] ?? array() as $sub ) {
+					if ( ! is_array( $sub ) ) {
+						continue;
 					}
-					$row['sections'][] = $sec_row;
+					$sub_id = sanitize_key( $sub['id'] ?? '' );
+					if ( '' === $sub_id ) {
+						continue;
+					}
+					$sub_row = array(
+						'id'       => $sub_id,
+						'label'    => isset( $sub['label'] ) ? wp_kses_post( $sub['label'] ) : '',
+						'sections' => array(),
+					);
+					foreach ( $sub['sections'] ?? array() as $sec ) {
+						$sub_row['sections'][] = $this->format_section_for_ui_response( $sec );
+					}
+					$row['subsections'][] = $sub_row;
 				}
 				if ( $row['slug'] ) {
 					$out[] = $row;

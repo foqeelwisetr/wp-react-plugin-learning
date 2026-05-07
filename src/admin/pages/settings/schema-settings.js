@@ -420,15 +420,47 @@ function SchemaField( { field, value, onChange } ) {
 		}
 		case 'hidden':
 			return null;
-		case 'html':
+		case 'link_buttons':
 			return (
-				<BaseControl>
-					<div
-						className="wpextrulepricing-settings-ui__html"
-						dangerouslySetInnerHTML={ { __html: field.content || '' } }
-					/>
+				<BaseControl
+					label={ field.label || undefined }
+					help={ field.description }
+				>
+					<div className="wpextrulepricing-settings-ui__link-buttons">
+						{ ( field.buttons || [] ).map( ( btn, idx ) => (
+							<Button
+								key={ `${ btn.label }-${ idx }` }
+								variant="secondary"
+								href={ btn.url || '#' }
+								target={
+									btn.opens_in_new_tab ? '_blank' : undefined
+								}
+								rel={
+									btn.opens_in_new_tab
+										? 'noopener noreferrer'
+										: undefined
+								}
+							>
+								{ btn.label }
+							</Button>
+						) ) }
+					</div>
 				</BaseControl>
 			);
+		case 'html': {
+			const block = (
+				<div
+					className="wpextrulepricing-settings-ui__html"
+					dangerouslySetInnerHTML={ { __html: field.content || '' } }
+				/>
+			);
+			if ( field.label ) {
+				return (
+					<BaseControl label={ field.label }>{ block }</BaseControl>
+				);
+			}
+			return block;
+		}
 		default:
 			return (
 				<TextControl
@@ -443,6 +475,36 @@ function SchemaField( { field, value, onChange } ) {
 }
 
 function TabPanel( { tab, values, onFieldChange } ) {
+	const subsections =
+		Array.isArray( tab?.subsections ) && tab.subsections.length > 0
+			? tab.subsections
+			: null;
+
+	const [ activeSubId, setActiveSubId ] = useState(
+		() => subsections?.[ 0 ]?.id || ''
+	);
+
+	const subsectionIdsKey = useMemo( () => {
+		if ( ! Array.isArray( tab?.subsections ) ) {
+			return '';
+		}
+		return tab.subsections.map( ( s ) => String( s.id ?? '' ) ).join( '|' );
+	}, [ tab?.subsections ] );
+
+	useEffect( () => {
+		if (
+			! Array.isArray( tab?.subsections ) ||
+			! tab.subsections.length
+		) {
+			return;
+		}
+		const subs = tab.subsections;
+		const ids = subs.map( ( s ) => s.id );
+		setActiveSubId( ( prev ) =>
+			ids.includes( prev ) ? prev : subs[ 0 ].id
+		);
+	}, [ tab?.slug, subsectionIdsKey ] );
+
 	if ( ! tab ) {
 		return (
 			<Notice status="warning" isDismissible={ false }>
@@ -451,19 +513,49 @@ function TabPanel( { tab, values, onFieldChange } ) {
 		);
 	}
 
+	const sectionsToRender = subsections
+		? subsections.find( ( s ) => s.id === activeSubId )?.sections ??
+		  []
+		: tab.sections ?? [];
+
 	return (
 		<div className="wpextrulepricing-settings-ui__main">
 			<h1 className="wpextrulepricing-settings-ui__page-title">
 				{ tab.label }
 			</h1>
-			{ tab.sections.map( ( section ) => (
+			{ subsections ? (
+				<div
+					className="wpextrulepricing-settings-ui__subsection-tabs"
+					role="tablist"
+					aria-label={ __( 'Panel sections', 'wp-ext-rule-pricing' ) }
+				>
+					{ subsections.map( ( sub ) => (
+						<button
+							key={ sub.id }
+							type="button"
+							className={
+								'wpextrulepricing-settings-ui__subsection-tab' +
+								( activeSubId === sub.id ? ' is-active' : '' )
+							}
+							role="tab"
+							aria-selected={ activeSubId === sub.id }
+							onClick={ () => setActiveSubId( sub.id ) }
+						>
+							{ sub.label || sub.id }
+						</button>
+					) ) }
+				</div>
+			) : null }
+			{ sectionsToRender.map( ( section ) => (
 				<div
 					key={ section.id }
 					className="wpextrulepricing-settings-ui__section"
 				>
-					<h2 className="wpextrulepricing-settings-ui__section-title">
-						{ section.title }
-					</h2>
+					{ section.title ? (
+						<h2 className="wpextrulepricing-settings-ui__section-title">
+							{ section.title }
+						</h2>
+					) : null }
 					{ section.description ? (
 						<p className="wpextrulepricing-settings-ui__section-desc">
 							{ section.description }

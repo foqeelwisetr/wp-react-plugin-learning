@@ -17,9 +17,35 @@ if ( ! defined( 'WP_EXT_RULE_PRICING_TABS_OPTION_NAME' ) ) {
 }
 
 /**
+ * Sections used for defaults, sanitization, and schema lookup for one tab.
+ * When `subsections` is non-empty, only those inner sections are used (horizontal sub-tabs).
+ *
+ * @param array<string, mixed> $tab Tab definition.
+ * @return array<int, array<string, mixed>>
+ */
+function wp_ext_rule_pricing_tab_iter_sections( $tab ) {
+	$tab = is_array( $tab ) ? $tab : array();
+	if ( ! empty( $tab['subsections'] ) && is_array( $tab['subsections'] ) ) {
+		$sections = array();
+		foreach ( $tab['subsections'] as $sub ) {
+			foreach ( $sub['sections'] ?? array() as $sec ) {
+				if ( is_array( $sec ) ) {
+					$sections[] = $sec;
+				}
+			}
+		}
+		return $sections;
+	}
+
+	return isset( $tab['sections'] ) && is_array( $tab['sections'] ) ? $tab['sections'] : array();
+}
+
+/**
  * Registered tabs (slug => config built from list).
  *
- * @return array<int, array{slug:string,label:string,sections:array}>
+ * Optional `subsections`: array of `{ id, label, sections }` for inner horizontal tabs (FunnelKit-style).
+ *
+ * @return array<int, array<string, mixed>>
  */
 function wp_ext_rule_pricing_get_settings_tabs_registry() {
 	$tabs = array(
@@ -215,6 +241,153 @@ function wp_ext_rule_pricing_get_settings_tabs_registry() {
 			),
 		),
 		array(
+			'slug'          => 'contact_pages',
+			'label'         => __( 'Contact Pages', 'wp-ext-rule-pricing' ),
+			'subsections'   => array(
+				array(
+					'id'       => 'subscribe_page',
+					'label'    => __( 'Subscribe Page', 'wp-ext-rule-pricing' ),
+					'sections' => array(
+						array(
+							'id'     => 'subscribe_main',
+							'title'  => '',
+							'fields' => array(
+								array(
+									'id'          => 'subscribe_wp_page_id',
+									'type'        => 'select',
+									'label'       => __( 'Page', 'wp-ext-rule-pricing' ),
+									'description' => __( 'Maps to a WordPress page (demo options).', 'wp-ext-rule-pricing' ),
+									'default'     => '0',
+									'options'     => array(
+										array(
+											'label' => __( '— Select —', 'wp-ext-rule-pricing' ),
+											'value' => '0',
+										),
+										array(
+											'label' => __( 'Let\'s Keep In Touch (demo)', 'wp-ext-rule-pricing' ),
+											'value' => 'demo_touch',
+										),
+										array(
+											'label' => __( 'Sample Page', 'wp-ext-rule-pricing' ),
+											'value' => 'demo_sample',
+										),
+									),
+								),
+								array(
+									'id'          => 'subscribe_page_type',
+									'type'        => 'radio',
+									'label'       => __( 'Page Type', 'wp-ext-rule-pricing' ),
+									'default'     => 'custom',
+									'options'     => array(
+										array(
+											'label' => __( 'Pre-built Page', 'wp-ext-rule-pricing' ),
+											'value' => 'prebuilt',
+										),
+										array(
+											'label' => __( 'Custom Page', 'wp-ext-rule-pricing' ),
+											'value' => 'custom',
+										),
+									),
+								),
+								array(
+									'id'      => 'subscribe_custom_description',
+									'type'    => 'html',
+									'content' => '<p class="description">' . esc_html__( 'Take control of your page\'s design and content. You can easily adjust everything to match your style and needs, from layout to colors and text.', 'wp-ext-rule-pricing' ) . '</p>',
+								),
+								array(
+									'id'      => 'subscribe_shortcodes_help',
+									'type'    => 'html',
+									'label'   => __( 'Use dynamic shortcodes on the page', 'wp-ext-rule-pricing' ),
+									'content' => '<div class="wpextrulepricing-settings-ui__shortcode-box"><ul><li>' . esc_html__( 'Contact Email:', 'wp-ext-rule-pricing' ) . ' <code>[fka_contact_email]</code></li><li>' . esc_html__( 'Contact Name:', 'wp-ext-rule-pricing' ) . ' <code>[fka_contact_name]</code></li><li>' . esc_html__( 'Contact First Name:', 'wp-ext-rule-pricing' ) . ' <code>[fka_contact_first_name]</code></li><li>' . esc_html__( 'Contact Last Name:', 'wp-ext-rule-pricing' ) . ' <code>[fka_contact_last_name]</code></li><li>' . esc_html__( 'Contact Subscribe Form:', 'wp-ext-rule-pricing' ) . ' <code>[fka_contact_subscribe_form label="Update my preference"]</code></li></ul></div>',
+								),
+								array(
+									'id'      => 'subscribe_actions',
+									'type'    => 'link_buttons',
+									'label'   => '',
+									'buttons' => array(
+										array(
+											'label'            => __( 'Edit Page', 'wp-ext-rule-pricing' ),
+											'url'              => admin_url( 'edit.php?post_type=page' ),
+											'opens_in_new_tab' => true,
+										),
+										array(
+											'label'            => __( 'Preview', 'wp-ext-rule-pricing' ),
+											'url'              => home_url( '/' ),
+											'opens_in_new_tab' => true,
+										),
+									),
+								),
+								array(
+									'id'          => 'subscribe_manage_lists',
+									'type'        => 'toggle',
+									'label'       => __( 'Allow contacts to manage their lists', 'wp-ext-rule-pricing' ),
+									'default'     => true,
+								),
+								array(
+									'id'          => 'subscribe_selected_lists',
+									'type'        => 'checkbox_group',
+									'label'       => __( 'Select Lists', 'wp-ext-rule-pricing' ),
+									'description' => __( 'Shown when list management is enabled.', 'wp-ext-rule-pricing' ),
+									'default'     => array(),
+									'options'     => array(
+										array( 'label' => __( 'list A', 'wp-ext-rule-pricing' ), 'value' => 'list_a' ),
+										array( 'label' => __( 'list b', 'wp-ext-rule-pricing' ), 'value' => 'list_b' ),
+										array( 'label' => __( 'list c', 'wp-ext-rule-pricing' ), 'value' => 'list_c' ),
+										array( 'label' => __( 'woo-beanie', 'wp-ext-rule-pricing' ), 'value' => 'woo_beanie' ),
+										array( 'label' => __( 'csv new', 'wp-ext-rule-pricing' ), 'value' => 'csv_new' ),
+										array( 'label' => __( 'v3', 'wp-ext-rule-pricing' ), 'value' => 'v3' ),
+									),
+								),
+							),
+						),
+					),
+				),
+				array(
+					'id'       => 'profile_page',
+					'label'    => __( 'Profile Page', 'wp-ext-rule-pricing' ),
+					'sections' => array(
+						array(
+							'id'          => 'profile_main',
+							'title'       => __( 'Profile Page options', 'wp-ext-rule-pricing' ),
+							'description' => __( 'Second inner tab: different fields, same PHP tab slug.', 'wp-ext-rule-pricing' ),
+							'fields'      => array(
+								array(
+									'id'          => 'profile_wp_page_id',
+									'type'        => 'select',
+									'label'       => __( 'Profile Page', 'wp-ext-rule-pricing' ),
+									'default'     => '0',
+									'options'     => array(
+										array(
+											'label' => __( '— Select —', 'wp-ext-rule-pricing' ),
+											'value' => '0',
+										),
+										array(
+											'label' => __( 'My Profile (demo)', 'wp-ext-rule-pricing' ),
+											'value' => 'demo_profile',
+										),
+									),
+								),
+								array(
+									'id'          => 'profile_show_avatar',
+									'type'        => 'toggle',
+									'label'       => __( 'Show avatar upload', 'wp-ext-rule-pricing' ),
+									'default'     => false,
+								),
+								array(
+									'id'          => 'profile_footer_note',
+									'type'        => 'textarea',
+									'label'       => __( 'Footer note on profile form', 'wp-ext-rule-pricing' ),
+									'default'     => '',
+									'rows'        => 3,
+								),
+							),
+						),
+					),
+				),
+			),
+			'sections'      => array(),
+		),
+		array(
 			'slug'     => 'advanced',
 			'label'    => __( 'Advanced', 'wp-ext-rule-pricing' ),
 			'sections' => array(
@@ -305,7 +478,7 @@ function wp_ext_rule_pricing_settings_tabs_defaults() {
 			continue;
 		}
 		$defaults[ $slug ] = array();
-		foreach ( $tab['sections'] as $section ) {
+		foreach ( wp_ext_rule_pricing_tab_iter_sections( $tab ) as $section ) {
 			if ( empty( $section['fields'] ) || ! is_array( $section['fields'] ) ) {
 				continue;
 			}
@@ -358,7 +531,7 @@ function wp_ext_rule_pricing_find_field_schema( $tab_slug, $field_id ) {
 		if ( sanitize_key( $tab['slug'] ?? '' ) !== $tab_slug ) {
 			continue;
 		}
-		foreach ( $tab['sections'] as $section ) {
+		foreach ( wp_ext_rule_pricing_tab_iter_sections( $tab ) as $section ) {
 			if ( empty( $section['fields'] ) ) {
 				continue;
 			}
@@ -532,6 +705,7 @@ function wp_ext_rule_pricing_sanitize_settings_field_value( $field, $value ) {
 			return isset( $field['default'] ) ? $field['default'] : $value;
 
 		case 'html':
+		case 'link_buttons':
 			return null;
 
 		case 'text':
@@ -581,7 +755,7 @@ function wp_ext_rule_pricing_sanitize_tab_patch( $tab_slug, $patch ) {
 			continue;
 		}
 		$ftype = isset( $schema['type'] ) ? sanitize_key( $schema['type'] ) : 'text';
-		if ( 'html' === $ftype ) {
+		if ( 'html' === $ftype || 'link_buttons' === $ftype ) {
 			continue;
 		}
 		$out[ $fid ] = wp_ext_rule_pricing_sanitize_settings_field_value( $schema, $raw_val );
