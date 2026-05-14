@@ -123,6 +123,10 @@
 		max-width: 640px;
 	}
 
+	.components-radio-control__group-wrapper {
+		display: -webkit-inline-box;
+	}
+
 	&__footer {
 		position: sticky;
 		bottom: 0;
