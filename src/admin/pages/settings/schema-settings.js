@@ -25,8 +25,44 @@ import { MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
 import { useParams } from 'react-router-dom';
 
 const SETTINGS_UI_PATH = 'wp-ext-rule-pricing/v1/settings-ui';
+const SAVE_SUCCESS_DISMISS_MS = 4000;
 
 let apiMiddlewareReady = false;
+
+function SaveFeedback( { notice } ) {
+	if ( ! notice ) {
+		return null;
+	}
+
+	if ( notice.status === 'success' ) {
+		return (
+			<p
+				className="wpextrulepricing-settings-ui__save-feedback wpextrulepricing-settings-ui__save-feedback--success"
+				role="status"
+				aria-live="polite"
+			>
+				{ notice.message }
+			</p>
+		);
+	}
+
+	return (
+		<div
+			className="wpextrulepricing-settings-ui__save-feedback wpextrulepricing-settings-ui__save-feedback--error"
+			role="alert"
+		>
+			<span
+				className="wpextrulepricing-settings-ui__save-feedback-icon"
+				aria-hidden="true"
+			>
+				i
+			</span>
+			<p className="wpextrulepricing-settings-ui__save-feedback-text">
+				{ notice.message }
+			</p>
+		</div>
+	);
+}
 
 /**
  * @param {unknown} raw
@@ -650,6 +686,7 @@ export default function SchemaSettings( { tabs, values, setValues } ) {
 				setNotice( {
 					status: 'error',
 					message:
+						err?.data?.message ||
 						err?.message ||
 						__( 'Could not save settings.', 'wp-ext-rule-pricing' ),
 				} );
@@ -661,6 +698,16 @@ export default function SchemaSettings( { tabs, values, setValues } ) {
 		setupApiFetch();
 	}, [] );
 
+	useEffect( () => {
+		if ( notice?.status !== 'success' ) {
+			return undefined;
+		}
+		const timer = window.setTimeout( () => {
+			setNotice( null );
+		}, SAVE_SUCCESS_DISMISS_MS );
+		return () => window.clearTimeout( timer );
+	}, [ notice ] );
+
 	return (
 		<>
 			<TabPanel
@@ -669,16 +716,19 @@ export default function SchemaSettings( { tabs, values, setValues } ) {
 				onFieldChange={ onFieldChange }
 			/>
 			<div className="wpextrulepricing-settings-ui__footer">
-				{ notice ? (
-					<Notice status={ notice.status } isDismissible={ false }>
-						{ notice.message }
-					</Notice>
+				<div className="wpextrulepricing-settings-ui__footer-actions">
+					<Button variant="primary" onClick={ save } disabled={ saving }>
+						{ saving
+							? __( 'Saving…', 'wp-ext-rule-pricing' )
+							: __( 'Save settings', 'wp-ext-rule-pricing' ) }
+					</Button>
+					{ notice?.status === 'success' ? (
+						<SaveFeedback notice={ notice } />
+					) : null }
+				</div>
+				{ notice?.status === 'error' ? (
+					<SaveFeedback notice={ notice } />
 				) : null }
-				<Button variant="primary" onClick={ save } disabled={ saving }>
-					{ saving
-						? __( 'Saving…', 'wp-ext-rule-pricing' )
-						: __( 'Save settings', 'wp-ext-rule-pricing' ) }
-				</Button>
 			</div>
 		</>
 	);
