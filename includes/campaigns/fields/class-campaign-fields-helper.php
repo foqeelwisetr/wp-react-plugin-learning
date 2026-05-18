@@ -180,12 +180,27 @@ class WP_EXT_RULE_Pricing_Campaign_Fields_Helper {
 	}
 
 	/**
-	 * CSS class on the row grid wrapper (all columns in the row).
+	 * Generic field (any type) with optional default.
 	 *
-	 * @param string               $class CSS class string.
-	 * @param array<string, mixed> $field Field (usually first in row).
+	 * @param string               $id      Field id.
+	 * @param string               $type    Field type (yes_no, radio, text, …).
+	 * @param string               $label   Label.
+	 * @param mixed                $default Default value.
+	 * @param array<string, mixed> $extra   Extra keys (depends_on, description, options, …).
 	 * @return array<string, mixed>
 	 */
+	public static function field( $id, $type, $label, $default = '', $extra = array() ) {
+		return array_merge(
+			array(
+				'id'      => $id,
+				'type'    => $type,
+				'label'   => $label,
+				'default' => $default,
+			),
+			$extra
+		);
+	}
+
 	/**
 	 * Date picker field (HTML5 date — YYYY-MM-DD).
 	 *

@@ -25,7 +25,7 @@ function wp_ext_rule_pricing_campaign_inventory_sections() {
 				$h::yes_no(
 					'inventory_enabled',
 					__( 'Enable', 'wp-ext-rule-pricing' ),
-					'no',
+					'yes',
 					array(
 						'description' => __( 'Enable this to define units of item to be sold during campaign.', 'wp-ext-rule-pricing' ),
 					)

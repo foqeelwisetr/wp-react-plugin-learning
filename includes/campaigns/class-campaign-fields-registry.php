@@ -62,6 +62,39 @@ class WP_EXT_RULE_Pricing_Campaign_Fields_Registry {
 			}
 		}
 
-		return $defaults;
+		return apply_filters( 'wp_ext_rule_pricing_campaign_default_settings', $defaults );
+	}
+
+	/**
+	 * Merge saved settings with schema defaults (missing keys only).
+	 *
+	 * @param array<string, mixed>|null $settings Stored settings.
+	 * @return array<string, mixed>
+	 */
+	public static function merge_settings_with_defaults( $settings ) {
+		$defaults = self::default_settings();
+		$merged   = is_array( $settings ) ? $settings : array();
+
+		foreach ( $defaults as $tab_id => $tab_defaults ) {
+			if ( ! is_array( $tab_defaults ) ) {
+				continue;
+			}
+			if ( ! isset( $merged[ $tab_id ] ) || ! is_array( $merged[ $tab_id ] ) ) {
+				$merged[ $tab_id ] = $tab_defaults;
+				continue;
+			}
+			foreach ( $tab_defaults as $field_id => $default_value ) {
+				if ( ! array_key_exists( $field_id, $merged[ $tab_id ] ) ) {
+					$merged[ $tab_id ][ $field_id ] = $default_value;
+					continue;
+				}
+				$current = $merged[ $tab_id ][ $field_id ];
+				if ( ( '' === $current || null === $current ) && '' !== $default_value && null !== $default_value ) {
+					$merged[ $tab_id ][ $field_id ] = $default_value;
+				}
+			}
+		}
+
+		return $merged;
 	}
 }

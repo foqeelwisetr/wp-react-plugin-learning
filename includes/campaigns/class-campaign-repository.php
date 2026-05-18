@@ -195,6 +195,7 @@ class WP_EXT_RULE_Pricing_Campaign_Repository {
 		$settings = isset( $campaign['settings'] ) && is_array( $campaign['settings'] )
 			? $campaign['settings']
 			: array();
+		$settings = WP_EXT_RULE_Pricing_Campaign_Fields_Registry::merge_settings_with_defaults( $settings );
 
 		return array(
 			'id'         => isset( $campaign['id'] ) ? absint( $campaign['id'] ) : 0,

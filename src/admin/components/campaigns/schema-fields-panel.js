@@ -19,10 +19,14 @@ import {
 	getRowLabel,
 	groupFieldsIntoRows,
 } from '../../utils/field-row-groups';
+import {
+	getResolvedFieldValue,
+	resolveTabFieldValues,
+} from '../../utils/resolve-field-values';
 import { isPro } from '../../utils/is-pro';
 
 function ShowHideControl( { field, value, onChange, hideLabel } ) {
-	const current = value || field.default || 'show';
+	const current = getResolvedFieldValue( field, { [ field.id ]: value } );
 	return (
 		<div className="wpextrulepricing-show-hide">
 			{ [
@@ -42,7 +46,7 @@ function ShowHideControl( { field, value, onChange, hideLabel } ) {
 }
 
 function YesNoControl( { field, value, onChange } ) {
-	const current = value || field.default || 'no';
+	const current = getResolvedFieldValue( field, { [ field.id ]: value } ) || 'no';
 	return (
 		<div className="wpextrulepricing-yes-no">
 			{ [
@@ -98,6 +102,7 @@ function SchemaField( { field, value, onChange, hideLabel, onProClick } ) {
 		__next40pxDefaultSize: true,
 		__nextHasNoMarginBottom: true,
 	};
+	const resolvedValue = getResolvedFieldValue( field, { [ field.id ]: value } );
 	const label = hideLabel ? undefined : field.label;
 	const help = field.description;
 
@@ -208,7 +213,7 @@ function SchemaField( { field, value, onChange, hideLabel, onProClick } ) {
 					type="number"
 					label={ label }
 					help={ help }
-					value={ String( value ?? '' ) }
+					value={ String( resolvedValue ?? '' ) }
 					onChange={ ( v ) => onChange( v === '' ? '' : Number( v ) ) }
 					{ ...commonNext }
 				/>
@@ -219,7 +224,7 @@ function SchemaField( { field, value, onChange, hideLabel, onProClick } ) {
 					type="date"
 					label={ label }
 					help={ help }
-					value={ value ?? '' }
+					value={ resolvedValue ?? '' }
 					min={ field.min || undefined }
 					max={ field.max || undefined }
 					onChange={ onChange }
@@ -232,7 +237,7 @@ function SchemaField( { field, value, onChange, hideLabel, onProClick } ) {
 					type="time"
 					label={ label }
 					help={ help }
-					value={ value ?? '' }
+					value={ resolvedValue ?? '' }
 					min={ field.min || undefined }
 					max={ field.max || undefined }
 					step={ field.step || undefined }
@@ -263,7 +268,7 @@ function SchemaField( { field, value, onChange, hideLabel, onProClick } ) {
 				<SelectControl
 					label={ label }
 					help={ help }
-					value={ value ?? '' }
+					value={ resolvedValue ?? '' }
 					options={ ( field.options || [] ).map( ( o ) => ( {
 						label:
 							o.pro && ! isPro() ? `${ o.label } (Pro)` : o.label,
@@ -278,7 +283,7 @@ function SchemaField( { field, value, onChange, hideLabel, onProClick } ) {
 			return (
 				<BaseControl label={ label } help={ help }>
 					<RadioControl
-						selected={ value ?? '' }
+						selected={ resolvedValue ?? '' }
 						options={ ( field.options || [] ).map( ( o ) => ( {
 							label: o.pro && ! isPro() ? `${ o.label } (Pro)` : o.label,
 							value: o.value,
@@ -344,12 +349,19 @@ export default function SchemaFieldsPanel( {
 		);
 	}
 
-	const tabValues = values || {};
+	const tabValues = resolveTabFieldValues( sections, values || {} );
 	const readValue = ( field ) => {
 		if ( getFieldValue ) {
-			return getFieldValue( field );
+			const custom = getFieldValue( field );
+			if (
+				custom !== null &&
+				custom !== undefined &&
+				custom !== ''
+			) {
+				return custom;
+			}
 		}
-		return tabValues[ field.id ];
+		return getResolvedFieldValue( field, tabValues );
 	};
 	const handlePro = ( id ) => {
 		if ( onProClick ) {
@@ -498,11 +510,13 @@ export default function SchemaFieldsPanel( {
 											<td colSpan={ 2 }>
 												<SchemaField
 													field={ field }
-													value={
-														tabValues[ field.id ]
-													}
+													value={ readValue( field ) }
 													onChange={ ( v ) =>
-														onChange( field.id, v )
+														onChange(
+															field.id,
+															v,
+															field
+														)
 													}
 													hideLabel
 													onProClick={ handlePro }
@@ -543,11 +557,13 @@ export default function SchemaFieldsPanel( {
 											>
 												<SchemaField
 													field={ field }
-													value={
-														tabValues[ field.id ]
-													}
+													value={ readValue( field ) }
 													onChange={ ( v ) =>
-														onChange( field.id, v )
+														onChange(
+															field.id,
+															v,
+															field
+														)
 													}
 													hideLabel
 													onProClick={ handlePro }
