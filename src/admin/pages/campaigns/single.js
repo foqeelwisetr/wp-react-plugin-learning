@@ -2,9 +2,14 @@
  * Single campaign — full-page editor (Autonami /automation/:id style).
  */
 import { __ } from '@wordpress/i18n';
-import { useCallback, useEffect, useState } from '@wordpress/element';
-import { Spinner, TextControl } from '@wordpress/components';
+import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
+import classNames from 'classnames';
+import { Spinner } from '@wordpress/components';
 import { useNavigate, useParams } from 'react-router-dom';
+import {
+	isTabAccessible,
+	resolveActiveTab,
+} from '../../utils/resolve-campaign-tab';
 import CampaignFullscreenShell from '../../components/campaigns/campaign-fullscreen-shell';
 import RulesBuilder from '../../components/campaigns/rules-builder';
 import SchemaFieldsPanel from '../../components/campaigns/schema-fields-panel';
@@ -20,7 +25,7 @@ import {
 } from '../../hooks/use-campaigns-api';
 
 export default function CampaignSingle() {
-	const { id } = useParams();
+	const { id, tabId: urlTabId } = useParams();
 	const navigate = useNavigate();
 	const campaignId = parseInt( id, 10 );
 
@@ -38,7 +43,7 @@ export default function CampaignSingle() {
 		groups: [],
 		definitions: {},
 	} );
-	const [ activeTab, setActiveTab ] = useState( 'schedule' );
+	const [ activeTab, setActiveTab ] = useState( urlTabId || '' );
 	const [ loading, setLoading ] = useState( true );
 	const [ saving, setSaving ] = useState( false );
 	const [ error, setError ] = useState( null );
@@ -58,7 +63,12 @@ export default function CampaignSingle() {
 			fetchRuleTypes(),
 		] )
 			.then( ( [ item, tabList, types ] ) => {
-				setCampaign( item );
+				const settings = { ...( item?.settings || {} ) };
+				settings.schedule = {
+					...( settings.schedule || {} ),
+					priority: item?.priority ?? 10,
+				};
+				setCampaign( { ...item, settings } );
 				setTabs( Array.isArray( tabList ) ? tabList : [] );
 				setRuleTypes( types || { groups: [], definitions: {} } );
 			} )
@@ -75,18 +85,54 @@ export default function CampaignSingle() {
 		load();
 	}, [ load ] );
 
+	const hasProUnlocked = hasPro || isPro();
+
+	useEffect( () => {
+		setActiveTab( urlTabId || '' );
+	}, [ campaignId ] );
+
+	useEffect( () => {
+		if ( ! tabs.length || ! campaignId ) {
+			return;
+		}
+		const resolved = resolveActiveTab(
+			tabs,
+			urlTabId || activeTab,
+			hasProUnlocked
+		);
+		if ( resolved !== activeTab ) {
+			setActiveTab( resolved );
+		}
+		if ( urlTabId !== resolved ) {
+			navigate( `/campaigns/${ campaignId }/${ resolved }`, {
+				replace: true,
+			} );
+		}
+	}, [ tabs, urlTabId, campaignId, hasProUnlocked ] );
+
 	const patchCampaign = ( patch ) => {
 		setCampaign( ( prev ) => ( { ...prev, ...patch } ) );
 	};
 
-	const patchTabSetting = ( tabId, fieldId, value ) => {
+	const patchTabSetting = ( tabId, fieldId, value, fieldDef ) => {
 		setCampaign( ( prev ) => {
 			const settings = { ...( prev?.settings || {} ) };
 			const tabSettings = { ...( settings[ tabId ] || {} ) };
 			tabSettings[ fieldId ] = value;
 			settings[ tabId ] = tabSettings;
-			return { ...prev, settings };
+			const next = { ...prev, settings };
+			if ( fieldDef?.campaign_meta === 'priority' ) {
+				next.priority = parseInt( value, 10 ) || 10;
+			}
+			return next;
 		} );
+	};
+
+	const getTabFieldValue = ( tabId, field ) => {
+		if ( field?.campaign_meta === 'priority' ) {
+			return campaign?.priority ?? campaign?.settings?.[ tabId ]?.priority ?? 10;
+		}
+		return campaign?.settings?.[ tabId ]?.[ field.id ];
 	};
 
 	const handleSave = async () => {
@@ -96,7 +142,12 @@ export default function CampaignSingle() {
 		setSaving( true );
 		setNotice( '' );
 		try {
-			const saved = await saveCampaign( campaign.id, campaign );
+			const payload = { ...campaign };
+			const schedulePriority = payload.settings?.schedule?.priority;
+			if ( schedulePriority !== undefined && schedulePriority !== '' ) {
+				payload.priority = parseInt( schedulePriority, 10 ) || 10;
+			}
+			const saved = await saveCampaign( campaign.id, payload );
 			setCampaign( saved );
 			setNotice( __( 'Saved', 'wp-ext-rule-pricing' ) );
 			setTimeout( () => setNotice( '' ), 3000 );
@@ -115,19 +166,12 @@ export default function CampaignSingle() {
 	};
 
 	const activeTabDef = tabs.find( ( t ) => t.id === activeTab );
+	const isCanvasTab = useMemo(
+		() => activeTab === 'rules' || activeTabDef?.layout === 'canvas',
+		[ activeTab, activeTabDef ]
+	);
 
-	const isTabProLocked = ( tab ) => {
-		if ( hasPro || isPro() ) {
-			return false;
-		}
-		if ( tab.pro ) {
-			return true;
-		}
-		if ( tab.locked && ! tab.sections?.length ) {
-			return true;
-		}
-		return false;
-	};
+	const isTabProLocked = ( tab ) => ! isTabAccessible( tab, hasProUnlocked );
 
 	const handleTabClick = ( tab ) => {
 		if ( isTabProLocked( tab ) ) {
@@ -135,6 +179,7 @@ export default function CampaignSingle() {
 			return;
 		}
 		setActiveTab( tab.id );
+		navigate( `/campaigns/${ campaignId }/${ tab.id }` );
 	};
 
 	const sidebar = (
@@ -168,6 +213,14 @@ export default function CampaignSingle() {
 	);
 
 	const renderTabPanel = () => {
+		if ( ! activeTab ) {
+			return (
+				<p className="wpextrulepricing-campaign-fs__loading">
+					<Spinner />
+				</p>
+			);
+		}
+
 		if ( activeTab === 'rules' ) {
 			return (
 				<div className="wpextrulepricing-campaign-fs__panel wpextrulepricing-campaign-fs__panel--rules">
@@ -187,8 +240,11 @@ export default function CampaignSingle() {
 						tabId={ activeTab }
 						sections={ activeTabDef.sections }
 						values={ campaign?.settings?.[ activeTab ] || {} }
-						onChange={ ( fieldId, value ) =>
-							patchTabSetting( activeTab, fieldId, value )
+						getFieldValue={ ( field ) =>
+							getTabFieldValue( activeTab, field )
+						}
+						onChange={ ( fieldId, value, field ) =>
+							patchTabSetting( activeTab, fieldId, value, field )
 						}
 						onProClick={ openUpsell }
 					/>
@@ -243,6 +299,9 @@ export default function CampaignSingle() {
 	const shell = (
 		<CampaignFullscreenShell
 			title={ campaign?.title }
+			onTitleChange={ ( title ) => patchCampaign( { title } ) }
+			priority={ campaign?.priority ?? 10 }
+			onPriorityChange={ ( priority ) => patchCampaign( { priority } ) }
 			status={ campaign?.status || 'draft' }
 			onStatusChange={ ( status ) => patchCampaign( { status } ) }
 			onClose={ handleClose }
@@ -252,30 +311,33 @@ export default function CampaignSingle() {
 			sidebar={ sidebar }
 		>
 			<div className="wpextrulepricing-campaign-fs__editor">
-				<div className="wpextrulepricing-campaign-fs__editor-bar">
-					<TextControl
-						label={ __( 'Campaign title', 'wp-ext-rule-pricing' ) }
-						value={ campaign?.title || '' }
-						onChange={ ( title ) => patchCampaign( { title } ) }
-						className="wpextrulepricing-campaign-fs__title-field"
-					/>
-					<TextControl
-						label={ __( 'Priority', 'wp-ext-rule-pricing' ) }
-						type="number"
-						value={ String( campaign?.priority ?? 10 ) }
-						onChange={ ( val ) =>
-							patchCampaign( {
-								priority: parseInt( val, 10 ) || 10,
-							} )
-						}
-						className="wpextrulepricing-campaign-fs__priority-field"
-					/>
-				</div>
+				{ activeTabDef?.label ? (
+					<div className="wpextrulepricing-campaign-fs__editor-toolbar">
+						<h2 className="wpextrulepricing-campaign-fs__tab-heading">
+							{ activeTabDef.label }
+						</h2>
+					</div>
+				) : null }
 				{ error ? (
 					<p className="wpextrulepricing-campaigns__error">{ error }</p>
 				) : null }
-				<div className="wpextrulepricing-campaign-fs__settings-card">
-					{ renderTabPanel() }
+				<div
+					className={ classNames(
+						'wpextrulepricing-campaign-fs__editor-body',
+						isCanvasTab
+							? 'wpextrulepricing-campaign-fs__editor-body--canvas'
+							: 'wpextrulepricing-campaign-fs__editor-body--form'
+					) }
+				>
+					<div
+						className={
+							isCanvasTab
+								? 'wpextrulepricing-campaign-fs__canvas-panel'
+								: 'wpextrulepricing-campaign-fs__settings-card'
+						}
+					>
+						{ renderTabPanel() }
+					</div>
 				</div>
 			</div>
 		</CampaignFullscreenShell>

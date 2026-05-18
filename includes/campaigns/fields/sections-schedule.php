@@ -45,49 +45,69 @@ function wp_ext_rule_pricing_campaign_schedule_sections() {
 						),
 					),
 				),
-				array(
-					'id'          => 'start_date',
-					'type'        => 'text',
-					'label'       => __( 'Start Date & Time', 'wp-ext-rule-pricing' ),
-					'placeholder' => 'YYYY-MM-DD',
-					'default'     => '',
-					'depends_on'  => array(
-						'field' => 'schedule_type',
-						'value' => 'one_time',
-					),
+				$h::col(
+					2,
+					$h::row(
+						'start_datetime',
+						array(
+							'id'      => 'start_date',
+							'type'    => 'date',
+							'label'   => __( 'Start Date & Time', 'wp-ext-rule-pricing' ),
+							'default' => '',
+							'depends_on'  => array(
+								'field' => 'schedule_type',
+								'value' => 'one_time',
+							),
+						)
+					)
 				),
-				array(
-					'id'          => 'start_time',
-					'type'        => 'text',
-					'label'       => '',
-					'placeholder' => 'HH:MM',
-					'default'     => '',
-					'depends_on'  => array(
-						'field' => 'schedule_type',
-						'value' => 'one_time',
-					),
+				$h::col(
+					2,
+					$h::row(
+						'start_datetime',
+						array(
+							'id'      => 'start_time',
+							'type'    => 'time',
+							'label'   => '',
+							'default' => '',
+							'depends_on'  => array(
+								'field' => 'schedule_type',
+								'value' => 'one_time',
+							),
+						)
+					)
 				),
-				array(
-					'id'          => 'end_date',
-					'type'        => 'text',
-					'label'       => __( 'End Date & Time', 'wp-ext-rule-pricing' ),
-					'placeholder' => 'YYYY-MM-DD',
-					'default'     => '',
-					'depends_on'  => array(
-						'field' => 'schedule_type',
-						'value' => 'one_time',
-					),
+				$h::col(
+					2,
+					$h::row(
+						'end_datetime',
+						array(
+							'id'      => 'end_date',
+							'type'    => 'date',
+							'label'   => __( 'End Date & Time', 'wp-ext-rule-pricing' ),
+							'default' => '',
+							'depends_on'  => array(
+								'field' => 'schedule_type',
+								'value' => 'one_time',
+							),
+						)
+					)
 				),
-				array(
-					'id'          => 'end_time',
-					'type'        => 'text',
-					'label'       => '',
-					'placeholder' => 'HH:MM',
-					'default'     => '',
-					'depends_on'  => array(
-						'field' => 'schedule_type',
-						'value' => 'one_time',
-					),
+				$h::col(
+					2,
+					$h::row(
+						'end_datetime',
+						array(
+							'id'      => 'end_time',
+							'type'    => 'time',
+							'label'   => '',
+							'default' => '',
+							'depends_on'  => array(
+								'field' => 'schedule_type',
+								'value' => 'one_time',
+							),
+						)
+					)
 				),
 				$h::pro(
 					array(

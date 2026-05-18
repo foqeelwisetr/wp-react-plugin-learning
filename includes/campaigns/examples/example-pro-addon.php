@@ -72,6 +72,15 @@ function wp_ext_rule_pricing_example_register_contacts_tab() {
 // add_action( 'wp_ext_rule_pricing_register_campaign_tabs', 'wp_ext_rule_pricing_example_register_contacts_tab' );
 
 /**
+ * Field layout from PHP: row + col + custom classes.
+ *
+ * $h::col( 2, $h::row( 'my_row', array( 'id' => 'field_a', ... ) ) );
+ * $h::col( 2, $h::row( 'my_row', array( 'id' => 'field_b', 'label' => '' ) ) );
+ * $h::css_class( 'my-field-class', $field );
+ * $h::row_class( 'my-row-class', $first_field_in_row );
+ */
+
+/**
  * Add fields to an existing tab from Pro (filter sections by tab id).
  */
 function wp_ext_rule_pricing_example_extend_schedule_tab( $sections, $tab_id ) {

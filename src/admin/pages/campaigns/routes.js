@@ -1,5 +1,5 @@
 /**
- * Campaign routes: /campaigns, /campaigns/:id
+ * Campaign routes: /campaigns, /campaigns/:id, /campaigns/:id/:tabId
  */
 import { AtrcRoute, AtrcRoutes } from 'atrc';
 import CampaignsList from './list';
@@ -10,6 +10,7 @@ export default function CampaignRoutes() {
 		<AtrcRoutes>
 			<AtrcRoute index element={ <CampaignsList /> } />
 			<AtrcRoute path=":id" element={ <CampaignSingle /> } />
+			<AtrcRoute path=":id/:tabId" element={ <CampaignSingle /> } />
 		</AtrcRoutes>
 	);
 }

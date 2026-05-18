@@ -187,6 +187,62 @@ class WP_EXT_RULE_Pricing_Campaign_Pro_Upsell_Registry {
 				),
 			)
 		);
+
+		self::register(
+			array(
+				'id'          => 'bulk_assign_category',
+				'title'       => __( 'Assign Category', 'wp-ext-rule-pricing' ),
+				'headline'    => __( 'Unlock bulk category assignment for campaigns.', 'wp-ext-rule-pricing' ),
+				'button_text' => __( 'Upgrade to PRO', 'wp-ext-rule-pricing' ),
+				'upgrade_url' => $upgrade_url,
+				'preview'     => array(
+					'type'    => 'table',
+					'columns' => array(
+						__( 'Campaign', 'wp-ext-rule-pricing' ),
+						__( 'Category', 'wp-ext-rule-pricing' ),
+					),
+					'rows'    => array(
+						array( __( 'Summer sale', 'wp-ext-rule-pricing' ), __( 'Seasonal', 'wp-ext-rule-pricing' ) ),
+						array( __( 'Flash deal', 'wp-ext-rule-pricing' ), __( 'Promotions', 'wp-ext-rule-pricing' ) ),
+					),
+				),
+			)
+		);
+
+		self::register(
+			array(
+				'id'          => 'bulk_export',
+				'title'       => __( 'Export Campaigns', 'wp-ext-rule-pricing' ),
+				'headline'    => __( 'Unlock export for selected or all campaigns.', 'wp-ext-rule-pricing' ),
+				'button_text' => __( 'Upgrade to PRO', 'wp-ext-rule-pricing' ),
+				'upgrade_url' => $upgrade_url,
+				'preview'     => array(
+					'type'  => 'text',
+					'items' => array(
+						__( 'CSV / JSON export', 'wp-ext-rule-pricing' ),
+						__( 'Bulk export selected rows', 'wp-ext-rule-pricing' ),
+						__( 'Export all campaigns', 'wp-ext-rule-pricing' ),
+					),
+				),
+			)
+		);
+
+		self::register(
+			array(
+				'id'          => 'bulk_import',
+				'title'       => __( 'Import Campaigns', 'wp-ext-rule-pricing' ),
+				'headline'    => __( 'Unlock campaign import from file.', 'wp-ext-rule-pricing' ),
+				'button_text' => __( 'Upgrade to PRO', 'wp-ext-rule-pricing' ),
+				'upgrade_url' => $upgrade_url,
+				'preview'     => array(
+					'type'  => 'text',
+					'items' => array(
+						__( 'Import from CSV', 'wp-ext-rule-pricing' ),
+						__( 'Duplicate campaigns across sites', 'wp-ext-rule-pricing' ),
+					),
+				),
+			)
+		);
 	}
 
 	/**

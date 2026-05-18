@@ -2,10 +2,13 @@
  * Full-page campaign editor shell (Autonami workflow style).
  */
 import { __ } from '@wordpress/i18n';
-import { Button, ToggleControl } from '@wordpress/components';
+import { Button, TextControl, ToggleControl } from '@wordpress/components';
 
 export default function CampaignFullscreenShell( {
 	title,
+	onTitleChange,
+	priority,
+	onPriorityChange,
 	status,
 	onStatusChange,
 	onClose,
@@ -16,14 +19,30 @@ export default function CampaignFullscreenShell( {
 	children,
 } ) {
 	const isActive = status === 'active';
+	const canEditTitle = typeof onTitleChange === 'function';
 
 	return (
 		<div className="wpextrulepricing-campaign-fs">
 			<header className="wpextrulepricing-campaign-fs__header">
 				<div className="wpextrulepricing-campaign-fs__header-left">
-					<h1 className="wpextrulepricing-campaign-fs__title">
-						{ title || __( 'Untitled campaign', 'wp-ext-rule-pricing' ) }
-					</h1>
+					{ canEditTitle ? (
+						<TextControl
+							className="wpextrulepricing-campaign-fs__title-input"
+							value={ title || '' }
+							onChange={ onTitleChange }
+							placeholder={ __(
+								'Untitled campaign',
+								'wp-ext-rule-pricing'
+							) }
+							hideLabelFromVision
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
+						/>
+					) : (
+						<h1 className="wpextrulepricing-campaign-fs__title">
+							{ title || __( 'Untitled campaign', 'wp-ext-rule-pricing' ) }
+						</h1>
+					) }
 				</div>
 				<div className="wpextrulepricing-campaign-fs__header-right">
 					{ notice ? (
@@ -31,20 +50,35 @@ export default function CampaignFullscreenShell( {
 							{ notice }
 						</span>
 					) : null }
-					<div className="wpextrulepricing-campaign-fs__status">
-						<span className="wpextrulepricing-campaign-fs__status-label">
-							{ isActive
-								? __( 'Active', 'wp-ext-rule-pricing' )
-								: __( 'Inactive', 'wp-ext-rule-pricing' ) }
-						</span>
-						<ToggleControl
-							className="wpextrulepricing-campaign-fs__status-toggle"
-							checked={ isActive }
-							onChange={ ( checked ) =>
-								onStatusChange( checked ? 'active' : 'paused' )
-							}
-							__nextHasNoMarginBottom
-						/>
+					<div className="wpextrulepricing-campaign-fs__header-controls">
+						{ typeof onPriorityChange === 'function' ? (
+							<TextControl
+								className="wpextrulepricing-campaign-fs__priority-input"
+								type="number"
+								label={ __( 'Priority', 'wp-ext-rule-pricing' ) }
+								value={ String( priority ?? 10 ) }
+								onChange={ ( val ) =>
+									onPriorityChange( parseInt( val, 10 ) || 10 )
+								}
+								__next40pxDefaultSize
+								__nextHasNoMarginBottom
+							/>
+						) : null }
+						<div className="wpextrulepricing-campaign-fs__status">
+							<span className="wpextrulepricing-campaign-fs__status-label">
+								{ isActive
+									? __( 'Active', 'wp-ext-rule-pricing' )
+									: __( 'Inactive', 'wp-ext-rule-pricing' ) }
+							</span>
+							<ToggleControl
+								className="wpextrulepricing-campaign-fs__status-toggle"
+								checked={ isActive }
+								onChange={ ( checked ) =>
+									onStatusChange( checked ? 'active' : 'paused' )
+								}
+								__nextHasNoMarginBottom
+							/>
+						</div>
 					</div>
 					<Button
 						variant="primary"

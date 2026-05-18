@@ -37,6 +37,7 @@ class WP_EXT_RULE_Pricing_Campaign_Tab_Registry {
 				'description' => __( 'When the campaign runs.', 'wp-ext-rule-pricing' ),
 				'icon'        => 'calendar',
 				'locked'      => false,
+				'default'     => true,
 				'component'   => 'schedule',
 				'order'       => 10,
 			),
@@ -168,6 +169,7 @@ class WP_EXT_RULE_Pricing_Campaign_Tab_Registry {
 				'component'   => $id,
 				'order'       => 50,
 				'addon'       => '',
+				'default'     => false,
 				'sections'    => $sections,
 			)
 		);

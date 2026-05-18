@@ -12,7 +12,13 @@ import {
 	TextareaControl,
 	ToggleControl,
 } from '@wordpress/components';
+import classNames from 'classnames';
 import { isFieldVisible } from '../../utils/field-visibility';
+import {
+	getFieldColClass,
+	getRowLabel,
+	groupFieldsIntoRows,
+} from '../../utils/field-row-groups';
 import { isPro } from '../../utils/is-pro';
 
 function ShowHideControl( { field, value, onChange, hideLabel } ) {
@@ -207,6 +213,33 @@ function SchemaField( { field, value, onChange, hideLabel, onProClick } ) {
 					{ ...commonNext }
 				/>
 			);
+		case 'date':
+			return (
+				<TextControl
+					type="date"
+					label={ label }
+					help={ help }
+					value={ value ?? '' }
+					min={ field.min || undefined }
+					max={ field.max || undefined }
+					onChange={ onChange }
+					{ ...commonNext }
+				/>
+			);
+		case 'time':
+			return (
+				<TextControl
+					type="time"
+					label={ label }
+					help={ help }
+					value={ value ?? '' }
+					min={ field.min || undefined }
+					max={ field.max || undefined }
+					step={ field.step || undefined }
+					onChange={ onChange }
+					{ ...commonNext }
+				/>
+			);
 		case 'toggle':
 			return (
 				<ToggleControl
@@ -299,6 +332,7 @@ export default function SchemaFieldsPanel( {
 	tabId,
 	sections,
 	values,
+	getFieldValue,
 	onChange,
 	onProClick,
 } ) {
@@ -311,6 +345,12 @@ export default function SchemaFieldsPanel( {
 	}
 
 	const tabValues = values || {};
+	const readValue = ( field ) => {
+		if ( getFieldValue ) {
+			return getFieldValue( field );
+		}
+		return tabValues[ field.id ];
+	};
 	const handlePro = ( id ) => {
 		if ( onProClick ) {
 			onProClick( id );
@@ -336,8 +376,100 @@ export default function SchemaFieldsPanel( {
 					) : null }
 					<table className="wpextrulepricing-campaign-fields__table form-table">
 						<tbody>
-							{ ( section.fields || [] ).map( ( field ) => {
-								if ( field.type === 'help' && field.store === false ) {
+							{ groupFieldsIntoRows(
+								section.fields || [],
+								tabValues
+							).map( ( group ) => {
+								if ( group.type === 'row' ) {
+									const rowKey = group.fields
+										.map( ( f ) => f.id )
+										.join( '-' );
+									const rowLabel = getRowLabel( group.fields );
+									const labelField = group.fields.find(
+										( f ) => f.label
+									);
+									return (
+										<tr
+											key={ rowKey }
+											className={ classNames(
+												'wpextrulepricing-campaign-fields__row',
+												'wpextrulepricing-campaign-fields__row--grid',
+												group.rowClass
+											) }
+										>
+											<th scope="row">
+												{ rowLabel ? (
+													<label
+														htmlFor={
+															labelField
+																? `camp-${ tabId }-${ labelField.id }`
+																: undefined
+														}
+													>
+														{ rowLabel }
+														{ group.fields.some(
+															( f ) => f.pro
+														) ? (
+															<span className="wpextrulepricing-pro-badge">
+																Pro
+															</span>
+														) : null }
+													</label>
+												) : null }
+											</th>
+											<td>
+												<div
+													className={ classNames(
+														'wpextrulepricing-campaign-fields__grid',
+														`wpextrulepricing-campaign-fields__grid--${ group.fields.length }`
+													) }
+												>
+													{ group.fields.map(
+														( field ) => (
+															<div
+																key={ field.id }
+																className={ classNames(
+																	'wpextrulepricing-campaign-fields__col',
+																	getFieldColClass(
+																		field
+																	),
+																	field.class
+																) }
+															>
+																<SchemaField
+																	field={ field }
+																	value={ readValue(
+																		field
+																	) }
+																	onChange={ (
+																		v
+																	) =>
+																		onChange(
+																			field.id,
+																			v,
+																			field
+																		)
+																	}
+																	hideLabel
+																	onProClick={
+																		handlePro
+																	}
+																/>
+															</div>
+														)
+													) }
+												</div>
+											</td>
+										</tr>
+									);
+								}
+
+								const field = group.fields[ 0 ];
+
+								if (
+									field.type === 'help' &&
+									field.store === false
+								) {
 									return (
 										<tr
 											key={ field.id }
@@ -355,9 +487,7 @@ export default function SchemaFieldsPanel( {
 										</tr>
 									);
 								}
-								if ( ! isFieldVisible( field, tabValues ) ) {
-									return null;
-								}
+
 								const hideLabel = ! field.label;
 								if ( hideLabel ) {
 									return (
@@ -368,7 +498,9 @@ export default function SchemaFieldsPanel( {
 											<td colSpan={ 2 }>
 												<SchemaField
 													field={ field }
-													value={ tabValues[ field.id ] }
+													value={
+														tabValues[ field.id ]
+													}
 													onChange={ ( v ) =>
 														onChange( field.id, v )
 													}
@@ -379,10 +511,15 @@ export default function SchemaFieldsPanel( {
 										</tr>
 									);
 								}
+
 								return (
 									<tr
 										key={ field.id }
-										className="wpextrulepricing-campaign-fields__row"
+										className={ classNames(
+											'wpextrulepricing-campaign-fields__row',
+											field.row_class,
+											field.class
+										) }
 									>
 										<th scope="row">
 											<label
@@ -397,15 +534,25 @@ export default function SchemaFieldsPanel( {
 											</label>
 										</th>
 										<td>
-											<SchemaField
-												field={ field }
-												value={ tabValues[ field.id ] }
-												onChange={ ( v ) =>
-													onChange( field.id, v )
-												}
-												hideLabel
-												onProClick={ handlePro }
-											/>
+											<div
+												className={ classNames(
+													'wpextrulepricing-campaign-fields__col',
+													getFieldColClass( field ),
+													field.class
+												) }
+											>
+												<SchemaField
+													field={ field }
+													value={
+														tabValues[ field.id ]
+													}
+													onChange={ ( v ) =>
+														onChange( field.id, v )
+													}
+													hideLabel
+													onProClick={ handlePro }
+												/>
+											</div>
 										</td>
 									</tr>
 								);

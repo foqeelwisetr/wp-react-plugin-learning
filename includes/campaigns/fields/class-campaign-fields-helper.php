@@ -134,4 +134,106 @@ class WP_EXT_RULE_Pricing_Campaign_Fields_Helper {
 			'value' => true,
 		);
 	}
+
+	/**
+	 * Grid column width for multi-field rows (1 = full, 2 = half, 3 = third, etc.).
+	 *
+	 * @param int|string             $col   Column count (1–6) or string "col-2".
+	 * @param array<string, mixed>   $field Field.
+	 * @return array<string, mixed>
+	 */
+	public static function col( $col, $field ) {
+		$field['col'] = $col;
+		return $field;
+	}
+
+	/**
+	 * Group fields on one table row (label from first field in group).
+	 *
+	 * @param string               $row_id Row group id.
+	 * @param array<string, mixed> $field  Field.
+	 * @return array<string, mixed>
+	 */
+	public static function row( $row_id, $field ) {
+		$field['row'] = sanitize_key( (string) $row_id );
+		return $field;
+	}
+
+	/**
+	 * Extra CSS class(es) on the field column wrapper.
+	 *
+	 * @param string               $class CSS class string.
+	 * @param array<string, mixed> $field Field.
+	 * @return array<string, mixed>
+	 */
+	public static function css_class( $class, $field ) {
+		$class = trim( (string) $class );
+		if ( '' === $class ) {
+			return $field;
+		}
+		if ( ! empty( $field['class'] ) ) {
+			$field['class'] .= ' ' . $class;
+		} else {
+			$field['class'] = $class;
+		}
+		return $field;
+	}
+
+	/**
+	 * CSS class on the row grid wrapper (all columns in the row).
+	 *
+	 * @param string               $class CSS class string.
+	 * @param array<string, mixed> $field Field (usually first in row).
+	 * @return array<string, mixed>
+	 */
+	/**
+	 * Date picker field (HTML5 date — YYYY-MM-DD).
+	 *
+	 * @param string               $id    Field id.
+	 * @param string               $label Label.
+	 * @param array<string, mixed> $extra Extra keys (min, max, depends_on, …).
+	 * @return array<string, mixed>
+	 */
+	public static function date( $id, $label, $extra = array() ) {
+		return array_merge(
+			array(
+				'id'    => $id,
+				'type'  => 'date',
+				'label' => $label,
+			),
+			$extra
+		);
+	}
+
+	/**
+	 * Time picker field (HTML5 time — HH:MM).
+	 *
+	 * @param string               $id    Field id.
+	 * @param string               $label Label.
+	 * @param array<string, mixed> $extra Extra keys (min, max, step, …).
+	 * @return array<string, mixed>
+	 */
+	public static function time( $id, $label, $extra = array() ) {
+		return array_merge(
+			array(
+				'id'    => $id,
+				'type'  => 'time',
+				'label' => $label,
+			),
+			$extra
+		);
+	}
+
+	public static function row_class( $class, $field ) {
+		$class = trim( (string) $class );
+		if ( '' === $class ) {
+			return $field;
+		}
+		if ( ! empty( $field['row_class'] ) ) {
+			$field['row_class'] .= ' ' . $class;
+		} else {
+			$field['row_class'] = $class;
+		}
+		return $field;
+	}
 }
