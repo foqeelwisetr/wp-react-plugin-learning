@@ -3,6 +3,7 @@ import './admin.scss';
 
 /* WordPress */
 import { render, createContext, useContext } from '@wordpress/element';
+import { useLocation } from 'react-router-dom';
 
 /* Library */
 import { map, isEmpty } from 'lodash';
@@ -24,21 +25,50 @@ import { AtrcApplyWithSettings } from 'atrc/build/data';
 import AdminHeader from './components/organisms/admin-header';
 import Initlanding from './pages/landing';
 import InitSettings from './pages/settings/routes';
-import RulesPage from './pages/rules';
+import CampaignRoutes from './pages/campaigns/routes';
 
 /* Local */
 
 /* ==============Create Local Storage and Database Settings Context================== */
 export const AtrcReduxContextData = createContext();
 
+const isCampaignSingleView = ( pathname ) =>
+    /^\/campaigns\/\d+/.test( pathname || '' );
+
+const AppRootWrap = ( { children } ) => {
+    const location = useLocation();
+    const fullscreen = isCampaignSingleView( location.pathname );
+
+    return (
+        <AtrcWrap
+            variant="wrp"
+            className={
+                fullscreen
+                    ? 'wpextrulepricing-root--campaign-fs'
+                    : 'at-box-szg at-m at-typ'
+            }
+        >
+            { children }
+        </AtrcWrap>
+    );
+};
+
 const AdminRoutes = () => {
     const data = useContext(AtrcReduxContextData);
     const { dbNotices, dbRemoveNotice } = data;
+    const location = useLocation();
+    const fullscreenCampaign = isCampaignSingleView( location.pathname );
 
     return (
         <>
-            <AdminHeader />
-            <AtrcMain>
+            { ! fullscreenCampaign ? <AdminHeader /> : null }
+            <AtrcMain
+                className={
+                    fullscreenCampaign
+                        ? 'wpextrulepricing-main--campaign-fs'
+                        : ''
+                }
+            >
                 <AtrcRoutes>
                     <AtrcRoute
                         index
@@ -50,9 +80,8 @@ const AdminRoutes = () => {
                         element={<InitSettings />}
                     />
                     <AtrcRoute
-                        exact
-                        path='/rules'
-                        element={<RulesPage />}
+                        path='/campaigns/*'
+                        element={<CampaignRoutes />}
                     />
                 </AtrcRoutes>
                 {/*Notice is common for settings*/}
@@ -110,11 +139,9 @@ const InitDatabaseSettings = (props) => {
                     v7_relativeSplatPath: true,
                 } }
             >
-                <AtrcWrap
-                    variant='wrp'
-                    className='at-box-szg at-m at-typ'>
+                <AppRootWrap>
                     <AdminRoutes />
-                </AtrcWrap>
+                </AppRootWrap>
             </AtrcHashRouter>
         </AtrcReduxContextData.Provider>
     );

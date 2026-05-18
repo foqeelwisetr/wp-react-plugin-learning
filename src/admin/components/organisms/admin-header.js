@@ -29,8 +29,8 @@ const AdminHeader = () => {
             children: __('Settings', 'wp-ext-rule-pricing'),
         },
         {
-            to: '/rules',
-            children: __('Rules', 'wp-ext-rule-pricing'),
+            to: '/campaigns',
+            children: __('Campaigns', 'wp-ext-rule-pricing'),
         },
     ];
 

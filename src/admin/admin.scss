@@ -426,3 +426,851 @@
 		padding-left: 1.25em;
 	}
 }
+
+/* Campaigns (Finale-style list + single, shared shell) */
+.wpextrulepricing-campaigns {
+	padding: 8px 12px 96px;
+	max-width: 1200px;
+
+	&__toolbar {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 12px 24px;
+		margin-bottom: 20px;
+		padding-bottom: 12px;
+		border-bottom: 1px solid #dcdcde;
+	}
+
+	&__toolbar-start {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	&__back,
+	&__close {
+		font-size: 13px;
+		text-decoration: none;
+	}
+
+	&__page-title {
+		flex: 1;
+		font-size: 23px;
+		font-weight: 400;
+		margin: 0;
+		min-width: 200px;
+	}
+
+	&__toolbar-actions {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		margin-left: auto;
+	}
+
+	&__body {
+		display: block;
+
+		&--with-sidebar {
+			display: grid;
+			grid-template-columns: 200px 1fr;
+			gap: 24px;
+			align-items: start;
+		}
+	}
+
+	&__sidebar {
+		border-right: 1px solid #dcdcde;
+		padding-right: 16px;
+	}
+
+	&__tabs ul {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	&__tab {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		width: 100%;
+		margin: 0 0 4px;
+		padding: 10px 12px;
+		border: 0;
+		border-radius: 4px;
+		background: transparent;
+		text-align: left;
+		font-size: 13px;
+		cursor: pointer;
+		color: #1d2327;
+
+		&:hover:not(:disabled) {
+			background: #f0f0f1;
+		}
+
+		&.is-active {
+			background: #2271b1;
+			color: #fff;
+		}
+
+		&:disabled {
+			opacity: 0.55;
+			cursor: not-allowed;
+		}
+	}
+
+	&__tab-lock {
+		font-size: 11px;
+	}
+
+	&__main {
+		min-width: 0;
+	}
+
+	&__table {
+		width: 100%;
+		margin-top: 8px;
+
+		.wpextrulepricing-campaigns__row-link {
+			text-decoration: none;
+		}
+	}
+
+	&__status {
+		display: inline-block;
+		padding: 2px 8px;
+		border-radius: 3px;
+		font-size: 12px;
+		background: #f0f0f1;
+
+		&--active {
+			background: #d5f5e3;
+			color: #1e4620;
+		}
+
+		&--paused {
+			background: #fcf3cf;
+		}
+	}
+
+	&__error {
+		color: #b32d2e;
+	}
+
+	&__empty {
+		padding: 24px 0;
+	}
+
+	&__title-input input {
+		font-size: 1.4em;
+		height: auto;
+		padding: 8px 12px;
+	}
+
+	&__meta-row {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 16px 24px;
+		margin: 16px 0 24px;
+		max-width: 480px;
+	}
+
+	&__settings-metabox {
+		border: 1px solid #c3c4c7;
+		background: #fff;
+		box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+	}
+
+	&__panel {
+		padding: 16px 20px 24px;
+
+		&--locked {
+			color: #646970;
+		}
+	}
+}
+
+/* Rules builder (Finale wcct-rules-builder) */
+.wpextrulepricing-rules-builder {
+	display: grid;
+	grid-template-columns: 220px 1fr;
+	gap: 20px 24px;
+	padding: 0;
+
+	&__label h4 {
+		margin: 0 0 8px;
+		font-size: 14px;
+	}
+
+	&__groups {
+		min-width: 0;
+	}
+
+	&__group {
+		margin-bottom: 20px;
+		padding-bottom: 16px;
+		border-bottom: 1px solid #f0f0f1;
+
+		&:last-of-type {
+			border-bottom: 0;
+		}
+	}
+
+	&__group-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 12px;
+
+		h4 {
+			margin: 0;
+			font-size: 13px;
+			font-weight: 600;
+		}
+	}
+
+	&__table {
+		width: 100%;
+		border-collapse: collapse;
+
+		td {
+			vertical-align: top;
+			padding: 8px 6px 8px 0;
+		}
+	}
+
+	&__type {
+		min-width: 220px;
+	}
+
+	&__fields {
+		.components-base-control {
+			margin-bottom: 8px;
+		}
+	}
+
+	&__summary {
+		margin: 8px 0 0;
+		font-style: italic;
+	}
+
+	&__and .components-button {
+		min-width: 64px;
+	}
+
+	&__remove .components-button {
+		font-size: 20px;
+		line-height: 1;
+		padding: 4px 8px;
+	}
+
+	&__or-label {
+		margin: 8px 0 12px;
+		font-size: 13px;
+		font-weight: 400;
+		color: #646970;
+	}
+
+	&__pro-note {
+		margin-top: 16px;
+	}
+}
+
+/* Autonami-style campaign listing */
+.wpextrulepricing-campaign-list {
+	&__title {
+		font-size: 20px;
+		font-weight: 600;
+		margin: 0 0 16px;
+		display: flex;
+		align-items: baseline;
+		gap: 8px;
+	}
+
+	&__count {
+		font-size: 14px;
+		font-weight: 400;
+		color: #646970;
+	}
+
+	&__filters {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+		margin-bottom: 16px;
+		padding-bottom: 12px;
+		border-bottom: 1px solid #dcdcde;
+	}
+
+	&__status-tabs {
+		display: flex;
+		gap: 4px;
+	}
+
+	&__status-tab {
+		margin: 0;
+		padding: 8px 14px;
+		border: 0;
+		border-bottom: 2px solid transparent;
+		background: transparent;
+		font-size: 13px;
+		color: #646970;
+		cursor: pointer;
+
+		&.is-active {
+			color: #2271b1;
+			border-bottom-color: #2271b1;
+			font-weight: 600;
+		}
+	}
+
+	&__filters-right {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		min-width: 280px;
+
+		.components-search-control {
+			min-width: 200px;
+		}
+	}
+
+	&__table-wrap {
+		background: #fff;
+		border: 1px solid #c3c4c7;
+		box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+	}
+
+	&__table {
+		margin: 0;
+		border: 0;
+
+		.check-column {
+			width: 2.2em;
+			padding: 10px 0 10px 12px;
+		}
+
+		thead th,
+		tbody td {
+			padding: 12px 10px;
+			vertical-align: middle;
+		}
+
+		tbody tr.is-selected {
+			background: #f0f6fc;
+		}
+
+		.wpextrulepricing-campaign-list__name {
+			text-decoration: none;
+			color: #2271b1;
+
+			&:hover strong {
+				text-decoration: underline;
+			}
+		}
+	}
+
+	&__status {
+		display: inline-block;
+		font-size: 12px;
+		font-weight: 500;
+
+		&--active {
+			color: #00a32a;
+		}
+
+		&--paused,
+		&--draft {
+			color: #d63638;
+		}
+	}
+
+	&__actions-col {
+		width: 48px;
+		text-align: right;
+	}
+
+	&__loading {
+		padding: 24px;
+	}
+}
+
+/* Campaign tab fields (Finale form-table) */
+.wpextrulepricing-campaigns__tabs-heading {
+	font-size: 12px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: #646970;
+	margin: 0 0 12px;
+	padding: 0 12px;
+}
+
+.wpextrulepricing-campaign-fields {
+	&__section {
+		margin-bottom: 24px;
+	}
+
+	&__section-title {
+		margin: 0 0 8px;
+		font-size: 14px;
+		font-weight: 600;
+		padding: 0 4px;
+	}
+
+	&__section-desc {
+		margin: 0 0 16px;
+		padding: 0 4px;
+	}
+
+	&__table {
+		width: 100%;
+		margin: 0;
+
+		th {
+			width: 220px;
+			padding: 16px 12px 16px 0;
+			vertical-align: top;
+			font-weight: 400;
+		}
+
+		td {
+			padding: 12px 0;
+			vertical-align: top;
+		}
+	}
+
+	&__color {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+
+		input[type='color'] {
+			width: 48px;
+			height: 36px;
+			padding: 2px;
+			border: 1px solid #8c8f94;
+			border-radius: 4px;
+		}
+	}
+
+	&__row--help td {
+		padding-top: 4px;
+		padding-bottom: 4px;
+	}
+
+	&__help .dashicons {
+		margin-right: 4px;
+		color: #646970;
+	}
+}
+
+.wpextrulepricing-show-hide,
+.wpextrulepricing-yes-no,
+.wpextrulepricing-schedule-type {
+	display: inline-flex;
+	flex-wrap: wrap;
+	gap: 6px;
+
+	.components-button.is-pro-locked {
+		opacity: 0.65;
+	}
+}
+
+.wpextrulepricing-pro-badge {
+	display: inline-block;
+	margin-left: 6px;
+	padding: 1px 6px;
+	font-size: 10px;
+	font-weight: 600;
+	text-transform: uppercase;
+	background: #f0f0f1;
+	color: #646970;
+	border-radius: 3px;
+	vertical-align: middle;
+}
+
+.wpextrulepricing-campaign-field.is-pro-locked {
+	padding: 8px 12px;
+	background: #f6f7f7;
+	border: 1px dashed #c3c4c7;
+	border-radius: 4px;
+}
+
+.wpextrulepricing-pro-modal__actions {
+	margin-top: 16px;
+	text-align: right;
+}
+
+/* Full-screen single campaign (Autonami workflow editor) */
+body.wpextrulepricing-campaign-fullscreen {
+	#wpcontent,
+	#wpbody-content {
+		padding-left: 0 !important;
+		margin-left: 0 !important;
+	}
+
+	#wpbody-content {
+		padding-bottom: 0;
+	}
+
+	#adminmenuback,
+	#adminmenuwrap {
+		display: none;
+	}
+
+	#wpfooter {
+		display: none;
+	}
+
+	.auto-fold #wpcontent {
+		margin-left: 0 !important;
+	}
+}
+
+.wpextrulepricing-root--campaign-fs {
+	margin: 0 !important;
+	padding: 0 !important;
+	max-width: none !important;
+	width: 100% !important;
+}
+
+.wpextrulepricing-main--campaign-fs {
+	margin: 0 !important;
+	padding: 0 !important;
+	max-width: none !important;
+}
+
+.wpextrulepricing-campaign-fs {
+	position: fixed;
+	z-index: 100000;
+	top: 32px;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	display: flex;
+	flex-direction: column;
+	background: #f6f7f7;
+	overflow: hidden;
+
+	@media screen and (max-width: 782px) {
+		top: 46px;
+	}
+
+	&__header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 16px;
+		min-height: 56px;
+		padding: 0 20px;
+		background: #fff;
+		border-bottom: 1px solid #dcdcde;
+		flex-shrink: 0;
+	}
+
+	&__header-left {
+		min-width: 0;
+		flex: 1;
+	}
+
+	&__title {
+		margin: 0;
+		font-size: 16px;
+		font-weight: 600;
+		color: #1d2327;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	&__header-right {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		flex-shrink: 0;
+	}
+
+	&__notice {
+		font-size: 13px;
+		color: #00a32a;
+	}
+
+	&__status {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 0 8px;
+		border-right: 1px solid #dcdcde;
+		margin-right: 4px;
+	}
+
+	&__status-label {
+		font-size: 13px;
+		color: #646970;
+	}
+
+	&__status-toggle {
+		margin-bottom: 0 !important;
+	}
+
+	&__close {
+		font-size: 24px !important;
+		line-height: 1;
+		min-width: 36px;
+		height: 36px;
+		padding: 0 !important;
+	}
+
+	&__layout {
+		display: flex;
+		flex: 1;
+		min-height: 0;
+		overflow: hidden;
+	}
+
+	&__sidebar {
+		width: 200px;
+		flex-shrink: 0;
+		background: #fff;
+		border-right: 1px solid #dcdcde;
+		overflow-y: auto;
+	}
+
+	&__nav {
+		ul {
+			margin: 0;
+			padding: 12px 0;
+			list-style: none;
+		}
+	}
+
+	&__nav-item {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		width: 100%;
+		margin: 0;
+		padding: 12px 20px;
+		border: 0;
+		border-left: 3px solid transparent;
+		background: transparent;
+		text-align: left;
+		font-size: 14px;
+		color: #3c434a;
+		cursor: pointer;
+
+		&:hover {
+			background: #f6f7f7;
+			color: #1d2327;
+		}
+
+		&.is-active {
+			border-left-color: #2271b1;
+			background: #f0f6fc;
+			color: #1d2327;
+			font-weight: 600;
+		}
+	}
+
+	&__nav-lock {
+		font-size: 11px;
+		opacity: 0.7;
+	}
+
+	&__main {
+		flex: 1;
+		min-width: 0;
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+	}
+
+	&__canvas {
+		flex: 1;
+		overflow: auto;
+		padding: 24px 32px;
+	}
+
+	&__editor {
+		max-width: 960px;
+		margin: 0 auto;
+	}
+
+	&__editor-bar {
+		display: grid;
+		grid-template-columns: 1fr 140px;
+		gap: 16px;
+		margin-bottom: 20px;
+	}
+
+	&__settings-card {
+		background: #fff;
+		border: 1px solid #c3c4c7;
+		border-radius: 4px;
+		box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+		padding: 8px 16px 24px;
+	}
+
+	&__panel--rules {
+		padding: 16px 8px;
+	}
+
+	&__loading {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 48px;
+		justify-content: center;
+	}
+}
+
+/* Autonami-style delete confirmation */
+.wpextrulepricing-delete-modal {
+	.components-modal__content {
+		padding-bottom: 20px;
+	}
+
+	.components-modal__header {
+		border-bottom: 1px solid #e0e0e0;
+	}
+
+	&__message {
+		margin: 8px 0 28px;
+		font-size: 14px;
+		line-height: 1.6;
+		color: #3c434a;
+
+		strong {
+			font-weight: 600;
+			color: #1d2327;
+		}
+	}
+
+	&__actions {
+		display: flex;
+		justify-content: flex-end;
+		align-items: center;
+		gap: 12px;
+	}
+
+	&__confirm.components-button.is-primary {
+		background: #e15b3f;
+		border-color: #e15b3f;
+		color: #fff;
+		min-width: 88px;
+		justify-content: center;
+
+		&:hover:not(:disabled) {
+			background: #c94e35;
+			border-color: #c94e35;
+			color: #fff;
+		}
+
+		&:focus:not(:disabled) {
+			box-shadow: 0 0 0 1px #fff, 0 0 0 3px #e15b3f;
+		}
+	}
+}
+
+/* FunnelKit-style Pro upsell modal */
+.wpextrulepricing-pro-feature-modal {
+	.components-modal__content {
+		padding: 8px 24px 28px;
+	}
+
+	&__title {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		font-weight: 600;
+	}
+
+	&__preview {
+		margin: 0 0 20px;
+		padding: 16px;
+		background: #f3f0f8;
+		border-radius: 8px;
+	}
+
+	&__table {
+		width: 100%;
+		border-collapse: separate;
+		border-spacing: 0 6px;
+		font-size: 13px;
+
+		thead th {
+			padding: 0 12px 8px;
+			text-align: left;
+			font-weight: 600;
+			color: #646970;
+			font-size: 12px;
+		}
+
+		tbody tr {
+			background: #fff;
+			box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+		}
+
+		tbody td {
+			padding: 10px 12px;
+
+			&:first-child {
+				border-radius: 6px 0 0 6px;
+			}
+
+			&:last-child {
+				border-radius: 0 6px 6px 0;
+			}
+		}
+	}
+
+	&__headline {
+		text-align: center;
+		font-size: 15px;
+		font-weight: 500;
+		color: #1d2327;
+		margin: 0 0 16px;
+	}
+
+	&__cta-wrap {
+		text-align: center;
+	}
+
+	&__cta.components-button.is-primary {
+		width: 100%;
+		justify-content: center;
+		min-height: 44px;
+		font-size: 15px;
+		font-weight: 600;
+		background: linear-gradient(180deg, #ffc107 0%, #ff9800 100%);
+		border: none;
+		color: #1d2327;
+		box-shadow: 0 2px 4px rgba(255, 152, 0, 0.35);
+
+		&:hover:not(:disabled) {
+			background: linear-gradient(180deg, #ffca28 0%, #fb8c00 100%);
+			color: #1d2327;
+		}
+	}
+
+	&__footnote {
+		text-align: center;
+		margin-top: 12px;
+		font-size: 12px;
+		color: #646970;
+	}
+}
+
+.wpextrulepricing-pro-crown {
+	font-size: 16px;
+	line-height: 1;
+}
+
+.wpextrulepricing-schedule-type .components-button.is-pro-option {
+	opacity: 0.72;
+}

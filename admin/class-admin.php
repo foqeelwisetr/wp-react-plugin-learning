@@ -189,6 +189,7 @@ class WP_EXT_RULE_PRICING_Admin {
 				'nonce'       => wp_create_nonce( 'wp_rest' ),
 				'store'       => WP_EXT_RULE_PRICING_PLUGIN_NAME,
 				'rest_url'    => get_rest_url(),
+				'is_pro'      => (bool) apply_filters( 'wp_ext_rule_pricing_is_pro', false ),
 				'white_label' => wp_ext_rule_pricing_include()->get_white_label(),
 			)
 		);
