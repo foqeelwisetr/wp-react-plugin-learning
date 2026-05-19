@@ -1144,6 +1144,7 @@ body.wpextrulepricing-campaign-fullscreen {
 	&__header-left {
 		display: flex;
 		align-items: center;
+		gap: 12px;
 		min-width: 0;
 		flex: 1;
 	}
@@ -1187,9 +1188,6 @@ body.wpextrulepricing-campaign-fullscreen {
 		display: flex;
 		align-items: flex-end;
 		gap: 16px;
-		padding-right: 8px;
-		border-right: 1px solid #dcdcde;
-		margin-right: 4px;
 	}
 
 	&__priority-input {
@@ -1223,13 +1221,9 @@ body.wpextrulepricing-campaign-fullscreen {
 	&__header-right {
 		display: flex;
 		align-items: center;
-		gap: 12px;
+		gap: 16px;
 		flex-shrink: 0;
-	}
-
-	&__notice {
-		font-size: 13px;
-		color: #00a32a;
+		margin-left: auto;
 	}
 
 	&__status {
@@ -1254,6 +1248,32 @@ body.wpextrulepricing-campaign-fullscreen {
 		min-width: 36px;
 		height: 36px;
 		padding: 0 !important;
+	}
+
+	&__footer {
+		flex-shrink: 0;
+		padding: 16px 20px;
+		background: #fff;
+		border-top: 1px solid #c3c4c7;
+	}
+
+	&__footer-actions {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 12px;
+	}
+
+	&__save-feedback {
+		margin: 0;
+	}
+
+	&__save-feedback--success {
+		margin-left: auto;
+		color: #008a20;
+		font-size: 13px;
+		font-weight: 500;
+		line-height: 1.4;
 	}
 
 	&__layout {

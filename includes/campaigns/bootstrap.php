@@ -41,4 +41,4 @@ function wp_ext_rule_pricing_campaigns_init() {
 	WP_EXT_RULE_Pricing_Rule_Type_Registry::init();
 }
 
-add_action( 'plugins_loaded', 'wp_ext_rule_pricing_campaigns_init', 15 );
+add_action( 'init', 'wp_ext_rule_pricing_campaigns_init', 5 );

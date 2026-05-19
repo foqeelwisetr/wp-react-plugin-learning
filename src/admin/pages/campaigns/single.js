@@ -47,7 +47,7 @@ export default function CampaignSingle() {
 	const [ loading, setLoading ] = useState( true );
 	const [ saving, setSaving ] = useState( false );
 	const [ error, setError ] = useState( null );
-	const [ notice, setNotice ] = useState( '' );
+	const [ notice, setNotice ] = useState( null );
 
 	const load = useCallback( () => {
 		if ( ! campaignId || Number.isNaN( campaignId ) ) {
@@ -140,7 +140,7 @@ export default function CampaignSingle() {
 			return;
 		}
 		setSaving( true );
-		setNotice( '' );
+		setNotice( null );
 		try {
 			const payload = { ...campaign };
 			const schedulePriority = payload.settings?.schedule?.priority;
@@ -149,8 +149,11 @@ export default function CampaignSingle() {
 			}
 			const saved = await saveCampaign( campaign.id, payload );
 			setCampaign( saved );
-			setNotice( __( 'Saved', 'wp-ext-rule-pricing' ) );
-			setTimeout( () => setNotice( '' ), 3000 );
+			setNotice( {
+				status: 'success',
+				message: __( 'Saved successfully', 'wp-ext-rule-pricing' ),
+			} );
+			setTimeout( () => setNotice( null ), 3000 );
 		} catch ( err ) {
 			setError(
 				err?.message ||

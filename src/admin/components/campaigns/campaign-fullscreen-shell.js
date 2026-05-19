@@ -45,11 +45,6 @@ export default function CampaignFullscreenShell( {
 					) }
 				</div>
 				<div className="wpextrulepricing-campaign-fs__header-right">
-					{ notice ? (
-						<span className="wpextrulepricing-campaign-fs__notice">
-							{ notice }
-						</span>
-					) : null }
 					<div className="wpextrulepricing-campaign-fs__header-controls">
 						{ typeof onPriorityChange === 'function' ? (
 							<TextControl
@@ -81,14 +76,6 @@ export default function CampaignFullscreenShell( {
 						</div>
 					</div>
 					<Button
-						variant="primary"
-						onClick={ onSave }
-						isBusy={ saving }
-						disabled={ saving }
-					>
-						{ __( 'Update', 'wp-ext-rule-pricing' ) }
-					</Button>
-					<Button
 						variant="tertiary"
 						className="wpextrulepricing-campaign-fs__close"
 						onClick={ onClose }
@@ -110,6 +97,31 @@ export default function CampaignFullscreenShell( {
 					</div>
 				</main>
 			</div>
+			{ typeof onSave === 'function' ? (
+				<footer className="wpextrulepricing-campaign-fs__footer">
+					<div className="wpextrulepricing-campaign-fs__footer-actions">
+						<Button
+							variant="primary"
+							onClick={ onSave }
+							isBusy={ saving }
+							disabled={ saving }
+						>
+							{ saving
+								? __( 'Saving…', 'wp-ext-rule-pricing' )
+								: __( 'Update', 'wp-ext-rule-pricing' ) }
+						</Button>
+						{ notice?.status === 'success' ? (
+							<p
+								className="wpextrulepricing-campaign-fs__save-feedback wpextrulepricing-campaign-fs__save-feedback--success"
+								role="status"
+								aria-live="polite"
+							>
+								{ notice.message }
+							</p>
+						) : null }
+					</div>
+				</footer>
+			) : null }
 		</div>
 	);
 }
